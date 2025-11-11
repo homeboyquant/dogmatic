@@ -211,7 +211,9 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis 
                   </div>
                   <div className={styles.detailRow}>
                     <span className={styles.detailLabel}>Current Value</span>
-                    <span className={styles.detailValue}>${(currentPrice * position.shares).toFixed(2)}</span>
+                    <span className={`${styles.detailValue} ${pnl >= 0 ? styles.positive : styles.negative}`}>
+                      ${(currentPrice * position.shares).toFixed(2)}
+                    </span>
                   </div>
                 </div>
 

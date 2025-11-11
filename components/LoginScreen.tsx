@@ -24,8 +24,8 @@ export default function LoginScreen() {
           <img src="/dogs2.png" alt="Dogmatic" className={styles.logoImage} />
         </div>
 
-        <h1 className={styles.title}>Dogmatic</h1>
-        <p className={styles.subtitle}>Polymarket Trading Simulator</p>
+        <h1 className={styles.title}>Polydogs</h1>
+        <p className={styles.subtitle}>Polymarket Trading Journal</p>
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.inputGroup}>

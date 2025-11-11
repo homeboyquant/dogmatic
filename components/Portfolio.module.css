@@ -251,6 +251,14 @@
   letter-spacing: -0.01em;
 }
 
+.detailValue.positive {
+  color: #10b981;
+}
+
+.detailValue.negative {
+  color: #ef4444;
+}
+
 .positionThesis {
   padding: 16px;
   background: var(--bg-primary);

@@ -20,13 +20,13 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Dogmatic | Trading Simulator</title>
+        <title>Polydogs | Trading Journal</title>
         <meta name="description" content="Practice trading on Polymarket with virtual money" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <main className={styles.main}>
         <div className={styles.header}>
-          <div className={styles.logo}>Dogmatic</div>
+          <div className={styles.logo}>Polydogs</div>
           <div className={styles.nav}>
             <button
               className={`${styles.navButton} ${currentView === 'trading' ? styles.active : ''}`}
@@ -61,7 +61,7 @@ export default function Home() {
           <TradingSimulator currentView={currentView} />
         </div>
         <footer className={styles.footer}>
-          © 2024 Dogmatic • Paper Trading Simulator
+          © 2025 Polydogs • Paper Trading Journal
         </footer>
       </main>
     </>
