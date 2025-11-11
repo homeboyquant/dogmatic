@@ -651,27 +651,33 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
         <div className={styles.statCard}>
           <div className={styles.statLabel}>Total Value</div>
           <div className={styles.statValue}>${(() => {
-            const positionsValue = portfolio.positions.reduce((sum, pos) => {
-              const currentPrice = currentPrices[pos.id] || pos.avgPrice;
-              return sum + (currentPrice * pos.shares);
-            }, 0);
+            const positionsValue = portfolio.positions
+              .filter(pos => !pos.closed) // Only count open positions
+              .reduce((sum, pos) => {
+                const currentPrice = currentPrices[pos.id] || pos.avgPrice;
+                return sum + (currentPrice * pos.shares);
+              }, 0);
             return (portfolio.balance + positionsValue).toFixed(2);
           })()}</div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statLabel}>P&L</div>
           <div className={`${styles.statValue} ${(() => {
-            const totalPnL = portfolio.positions.reduce((sum, pos) => {
-              const currentPrice = currentPrices[pos.id] || pos.avgPrice;
-              return sum + ((currentPrice - pos.avgPrice) * pos.shares);
-            }, 0);
-            return totalPnL >= 0 ? styles.positive : styles.negative;
-          })()}`}>
-            {(() => {
-              const totalPnL = portfolio.positions.reduce((sum, pos) => {
+            const totalPnL = portfolio.positions
+              .filter(pos => !pos.closed) // Only count open positions
+              .reduce((sum, pos) => {
                 const currentPrice = currentPrices[pos.id] || pos.avgPrice;
                 return sum + ((currentPrice - pos.avgPrice) * pos.shares);
               }, 0);
+            return totalPnL >= 0 ? styles.positive : styles.negative;
+          })()}`}>
+            {(() => {
+              const totalPnL = portfolio.positions
+                .filter(pos => !pos.closed) // Only count open positions
+                .reduce((sum, pos) => {
+                  const currentPrice = currentPrices[pos.id] || pos.avgPrice;
+                  return sum + ((currentPrice - pos.avgPrice) * pos.shares);
+                }, 0);
               return `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toFixed(2)}`;
             })()}
           </div>
