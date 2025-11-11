@@ -279,15 +279,7 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
   }, [event, orderbooks]);
 
   const getBestPrice = (market: Market, side: 'YES' | 'NO', action: 'BUY' | 'SELL'): number => {
-    // First, try to use bestBid/bestAsk from market data (most reliable)
-    if (action === 'BUY' && market.bestAsk !== undefined) {
-      return parseFloat(market.bestAsk);
-    }
-    if (action === 'SELL' && market.bestBid !== undefined) {
-      return parseFloat(market.bestBid);
-    }
-
-    // Second, try orderbook data
+    // First priority: orderbook data for the specific side (most accurate - has separate YES/NO prices)
     const orderbookKey = `${market.id}_${side}`;
     const orderbook = orderbooks[orderbookKey];
 
@@ -297,6 +289,22 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
       }
       if (action === 'SELL' && orderbook.bids && orderbook.bids.length > 0) {
         return parseFloat(orderbook.bids[0].price);
+      }
+    }
+
+    // Second: use bestBid/bestAsk from market data (YES side only)
+    // Note: bestBid/bestAsk are always for YES side, need to invert for NO
+    if (market.bestAsk !== undefined && market.bestBid !== undefined) {
+      const yesBestAsk = parseFloat(market.bestAsk);
+      const yesBestBid = parseFloat(market.bestBid);
+
+      if (side === 'YES') {
+        return action === 'BUY' ? yesBestAsk : yesBestBid;
+      } else {
+        // For NO side, invert the YES prices
+        // NO ask = 1 - YES bid (what you pay to buy NO)
+        // NO bid = 1 - YES ask (what you get selling NO)
+        return action === 'BUY' ? (1 - yesBestBid) : (1 - yesBestAsk);
       }
     }
 
