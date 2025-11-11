@@ -11,6 +11,7 @@ interface PortfolioPosition {
   marketSlug: string;
   thesis?: string;
   eventImage?: string;
+  closed?: boolean;
 }
 
 interface PortfolioProps {
@@ -26,6 +27,7 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis 
   const [editingThesisId, setEditingThesisId] = useState<string | null>(null);
   const [editThesisValue, setEditThesisValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showClosed, setShowClosed] = useState(false);
 
   // Fetch prices function
   const fetchPrices = async () => {
@@ -106,12 +108,17 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis 
     return { pnl, pnlPercent, currentPrice };
   };
 
-  const totalPnL = positions.reduce((sum, pos) => {
+  // Filter positions based on view
+  const openPositions = positions.filter(pos => !pos.closed);
+  const closedPositions = positions.filter(pos => pos.closed);
+  const displayPositions = showClosed ? closedPositions : openPositions;
+
+  const totalPnL = openPositions.reduce((sum, pos) => {
     const { pnl } = calculatePnL(pos);
     return sum + pnl;
   }, 0);
 
-  const totalValue = positions.reduce((sum, pos) => {
+  const totalValue = openPositions.reduce((sum, pos) => {
     const { currentPrice } = calculatePnL(pos);
     return sum + (currentPrice * pos.shares);
   }, 0);
@@ -167,15 +174,32 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis 
         </div>
       </div>
 
+      <div className={styles.toggleContainer}>
+        <button
+          className={`${styles.toggleButton} ${!showClosed ? styles.active : ''}`}
+          onClick={() => setShowClosed(false)}
+        >
+          Open Positions ({openPositions.length})
+        </button>
+        <button
+          className={`${styles.toggleButton} ${showClosed ? styles.active : ''}`}
+          onClick={() => setShowClosed(true)}
+        >
+          Closed Positions ({closedPositions.length})
+        </button>
+      </div>
+
       <div className={styles.positions}>
-        {positions.length === 0 ? (
+        {displayPositions.length === 0 ? (
           <div className={styles.empty}>
             <div className={styles.emptyIcon}>📊</div>
-            <div className={styles.emptyText}>No open positions</div>
-            <div className={styles.emptySubtext}>Start trading to build your portfolio</div>
+            <div className={styles.emptyText}>No {showClosed ? 'closed' : 'open'} positions</div>
+            <div className={styles.emptySubtext}>
+              {showClosed ? 'No positions have been closed yet' : 'Start trading to build your portfolio'}
+            </div>
           </div>
         ) : (
-          positions.map((position) => {
+          displayPositions.map((position) => {
             const { pnl, pnlPercent, currentPrice } = calculatePnL(position);
 
             return (
@@ -271,12 +295,14 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis 
                   <div className={`${styles.pnlValue} ${pnl >= 0 ? styles.positive : styles.negative}`}>
                     {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} ({pnl >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
                   </div>
-                  <button
-                    className={styles.closeButton}
-                    onClick={() => onClose(position)}
-                  >
-                    Close Position
-                  </button>
+                  {!position.closed && (
+                    <button
+                      className={styles.closeButton}
+                      onClick={() => onClose(position)}
+                    >
+                      Close Position
+                    </button>
+                  )}
                 </div>
               </div>
             );

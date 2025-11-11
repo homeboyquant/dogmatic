@@ -123,6 +123,40 @@
   color: #ef4444;
 }
 
+.toggleContainer {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  width: fit-content;
+}
+
+.toggleButton {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.toggleButton:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.toggleButton.active {
+  background: var(--accent-primary);
+  color: white;
+}
+
 .positions {
   display: flex;
   flex-direction: column;

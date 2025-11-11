@@ -14,6 +14,9 @@ export interface Position {
   pnlPercent: number; // P&L percentage
   timestamp: number;
   thesis?: string; // User's reasoning for the trade
+  closed?: boolean; // Whether position has been closed
+  closedAt?: number; // Timestamp when position was closed
+  exitPrice?: number; // Price at which position was closed
 }
 
 export interface Trade {

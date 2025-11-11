@@ -534,6 +534,7 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
     }
 
     const total = position.shares * currentPrice;
+    const pnl = total - position.cost;
 
     const trade: Trade = {
       id: Date.now().toString(),
@@ -547,14 +548,28 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
       timestamp: Date.now(),
     };
 
+    // Mark position as closed instead of removing it
     setPortfolio(prev => ({
       ...prev,
       balance: prev.balance + total,
-      positions: prev.positions.filter(p => p.id !== position.id),
+      positions: prev.positions.map(p =>
+        p.id === position.id
+          ? {
+              ...p,
+              closed: true,
+              closedAt: Date.now(),
+              exitPrice: currentPrice,
+              currentPrice: currentPrice,
+              value: total,
+              pnl: pnl,
+              pnlPercent: (pnl / position.cost) * 100
+            }
+          : p
+      ),
       trades: [...prev.trades, trade],
     }));
 
-    setTradeSuccessMessage(`Closed ${position.side} position for $${total.toFixed(2)}!`);
+    setTradeSuccessMessage(`Closed ${position.side} position for $${total.toFixed(2)} (${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)})`);
     setShowTradeSuccess(true);
     setTimeout(() => setShowTradeSuccess(false), 3000);
   };
@@ -582,6 +597,7 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
     marketSlug: pos.marketSlug || event?.slug || '',
     thesis: pos.thesis,
     eventImage: pos.eventImage || event?.image || '',
+    closed: pos.closed,
   }));
 
   if (currentView === 'portfolio') {
