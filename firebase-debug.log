@@ -1,0 +1,139 @@
+[debug] [2025-11-10T06:56:15.129Z] ----------------------------------------------------------------------
+[debug] [2025-11-10T06:56:15.132Z] Command:       D:\node\node.exe C:\Users\Asus\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only firestore:rules
+[debug] [2025-11-10T06:56:15.133Z] CLI Version:   14.7.0
+[debug] [2025-11-10T06:56:15.133Z] Platform:      win32
+[debug] [2025-11-10T06:56:15.133Z] Node Version:  v22.16.0
+[debug] [2025-11-10T06:56:15.133Z] Time:          Mon Nov 10 2025 09:56:15 GMT+0300 (East Africa Time)
+[debug] [2025-11-10T06:56:15.133Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-10T06:56:15.426Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-10T06:56:15.428Z] > authorizing via signed-in user (homeboyquant@gmail.com)
+[debug] [2025-11-10T06:56:15.428Z] [iam] checking project homeboyquant-e5910 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2025-11-10T06:56:15.429Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:15.429Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:15.431Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/homeboyquant-e5910:testIamPermissions [none]
+[debug] [2025-11-10T06:56:15.431Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/homeboyquant-e5910:testIamPermissions x-goog-quota-user=projects/homeboyquant-e5910
+[debug] [2025-11-10T06:56:15.432Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/homeboyquant-e5910:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2025-11-10T06:56:17.270Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/homeboyquant-e5910:testIamPermissions 200
+[debug] [2025-11-10T06:56:17.271Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/homeboyquant-e5910:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'homeboyquant-e5910'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2025-11-10T06:56:17.274Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:17.274Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:17.274Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910:test [none]
+[debug] [2025-11-10T06:56:17.274Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910:test [omitted]
+[debug] [2025-11-10T06:56:18.463Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910:test 200
+[debug] [2025-11-10T06:56:18.463Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2025-11-10T06:56:18.464Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:18.464Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:18.464Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/homeboyquant-e5910/databases/(default) [none]
+[debug] [2025-11-10T06:56:20.141Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/homeboyquant-e5910/databases/(default) 200
+[debug] [2025-11-10T06:56:20.142Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/homeboyquant-e5910/databases/(default) {"name":"projects/homeboyquant-e5910/databases/(default)","uid":"2ccf587c-7a88-4c1c-96da-30fe0555014a","createTime":"2025-11-10T06:26:49.930657Z","updateTime":"2025-11-10T06:26:49.930657Z","locationId":"nam5","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2025-11-10T06:26:49.930657Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"s","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"IM6LwLqA55ADMKj2nr/65pAD"}
+[debug] [2025-11-10T06:56:20.142Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:20.142Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:20.143Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases pageSize=10&pageToken=
+[debug] [2025-11-10T06:56:20.911Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases 200
+[debug] [2025-11-10T06:56:20.912Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases {"releases":[{"name":"projects/homeboyquant-e5910/releases/cloud.firestore","rulesetName":"projects/homeboyquant-e5910/rulesets/06177d0e-2d99-4f7f-bef1-49be21ca7ccd","createTime":"2025-11-10T06:26:55.186896Z","updateTime":"2025-11-10T06:27:58.735861Z"}]}
+[debug] [2025-11-10T06:56:20.912Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:20.912Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:20.912Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets/06177d0e-2d99-4f7f-bef1-49be21ca7ccd [none]
+[debug] [2025-11-10T06:56:21.677Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets/06177d0e-2d99-4f7f-bef1-49be21ca7ccd 200
+[debug] [2025-11-10T06:56:21.677Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets/06177d0e-2d99-4f7f-bef1-49be21ca7ccd [omitted]
+[info] i  firestore: uploading rules firestore.rules... 
+[debug] [2025-11-10T06:56:21.678Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:21.678Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:21.678Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets [none]
+[debug] [2025-11-10T06:56:21.678Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets [omitted]
+[debug] [2025-11-10T06:56:22.553Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets 200
+[debug] [2025-11-10T06:56:22.553Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets {"name":"projects/homeboyquant-e5910/rulesets/d7da935a-3efa-4385-b8cb-1d2d3f349f30","source":{"files":[{"content":"rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    // Portfolio documents - one per user\n    match /portfolios/{userId} {\n      // Allow read/write for demo_user (development)\n      allow read, write: if userId == 'demo_user';\n\n      // For authenticated users (future):\n      // allow read, write: if request.auth != null && request.auth.uid == userId;\n\n      // Subcollections for trades and performance data\n      match /trades/{tradeId} {\n        allow read, write: if userId == 'demo_user';\n        // allow read, write: if request.auth != null && request.auth.uid == userId;\n      }\n\n      match /performance/{snapshotId} {\n        allow read, write: if userId == 'demo_user';\n        // allow read, write: if request.auth != null && request.auth.uid == userId;\n      }\n    }\n\n    // Deny all other access by default\n    match /{document=**} {\n      allow read, write: if false;\n    }\n  }\n}","name":"firestore.rules"}]},"createTime":"2025-11-10T06:56:22.567231Z","metadata":{"services":["cloud.firestore"]}}
+[debug] [2025-11-10T06:56:22.553Z] [rules] created ruleset projects/homeboyquant-e5910/rulesets/d7da935a-3efa-4385-b8cb-1d2d3f349f30
+[debug] [2025-11-10T06:56:22.554Z] [rules] releasing cloud.firestore/(default) with ruleset projects/homeboyquant-e5910/rulesets/d7da935a-3efa-4385-b8cb-1d2d3f349f30
+[debug] [2025-11-10T06:56:22.554Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:22.554Z] Checked if tokens are valid: true, expires at: 1762759717639
+[debug] [2025-11-10T06:56:22.554Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases/cloud.firestore/(default) [none]
+[debug] [2025-11-10T06:56:22.555Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases/cloud.firestore/(default) {"release":{"name":"projects/homeboyquant-e5910/releases/cloud.firestore/(default)","rulesetName":"projects/homeboyquant-e5910/rulesets/d7da935a-3efa-4385-b8cb-1d2d3f349f30"}}
+[debug] [2025-11-10T06:56:23.468Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases/cloud.firestore/(default) 200
+[debug] [2025-11-10T06:56:23.468Z] <<< [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases/cloud.firestore/(default) {"name":"projects/homeboyquant-e5910/releases/cloud.firestore","rulesetName":"projects/homeboyquant-e5910/rulesets/d7da935a-3efa-4385-b8cb-1d2d3f349f30","createTime":"2025-11-10T06:26:55.186896Z","updateTime":"2025-11-10T06:56:23.481940Z"}
+[debug] [2025-11-10T06:56:23.468Z] [rules] updated release projects/homeboyquant-e5910/releases/cloud.firestore
+[info] +  firestore: released rules firestore.rules to cloud.firestore 
+[info] 
+[info] +  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/homeboyquant-e5910/overview
+[debug] [2025-11-10T15:41:06.979Z] ----------------------------------------------------------------------
+[debug] [2025-11-10T15:41:06.985Z] Command:       D:\node\node.exe C:\Users\Asus\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only firestore:rules
+[debug] [2025-11-10T15:41:06.987Z] CLI Version:   14.7.0
+[debug] [2025-11-10T15:41:06.987Z] Platform:      win32
+[debug] [2025-11-10T15:41:06.988Z] Node Version:  v22.16.0
+[debug] [2025-11-10T15:41:06.989Z] Time:          Mon Nov 10 2025 18:41:06 GMT+0300 (East Africa Time)
+[debug] [2025-11-10T15:41:06.989Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-10T15:41:07.444Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-10T15:41:07.445Z] > authorizing via signed-in user (homeboyquant@gmail.com)
+[debug] [2025-11-10T15:41:07.446Z] [iam] checking project homeboyquant-e5910 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2025-11-10T15:41:07.448Z] Checked if tokens are valid: false, expires at: 1762759717639
+[debug] [2025-11-10T15:41:07.448Z] Checked if tokens are valid: false, expires at: 1762759717639
+[debug] [2025-11-10T15:41:07.448Z] > refreshing access token with scopes: []
+[debug] [2025-11-10T15:41:07.452Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-10T15:41:07.452Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-10T15:41:08.235Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-11-10T15:41:08.235Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-10T15:41:08.263Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/homeboyquant-e5910:testIamPermissions [none]
+[debug] [2025-11-10T15:41:08.263Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/homeboyquant-e5910:testIamPermissions x-goog-quota-user=projects/homeboyquant-e5910
+[debug] [2025-11-10T15:41:08.264Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/homeboyquant-e5910:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2025-11-10T15:41:09.937Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/homeboyquant-e5910:testIamPermissions 200
+[debug] [2025-11-10T15:41:09.937Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/homeboyquant-e5910:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'homeboyquant-e5910'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2025-11-10T15:41:09.943Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:09.943Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:09.943Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910:test [none]
+[debug] [2025-11-10T15:41:09.944Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910:test [omitted]
+[debug] [2025-11-10T15:41:11.185Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910:test 200
+[debug] [2025-11-10T15:41:11.185Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2025-11-10T15:41:11.186Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:11.186Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:11.187Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/homeboyquant-e5910/databases/(default) [none]
+[debug] [2025-11-10T15:41:12.840Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/homeboyquant-e5910/databases/(default) 200
+[debug] [2025-11-10T15:41:12.840Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/homeboyquant-e5910/databases/(default) {"name":"projects/homeboyquant-e5910/databases/(default)","uid":"2ccf587c-7a88-4c1c-96da-30fe0555014a","createTime":"2025-11-10T06:26:49.930657Z","updateTime":"2025-11-10T06:26:49.930657Z","locationId":"nam5","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2025-11-10T14:41:12.830643Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"s","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"IOH/ruP155ADMKj2nr/65pAD"}
+[debug] [2025-11-10T15:41:12.842Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:12.842Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:12.843Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases pageSize=10&pageToken=
+[debug] [2025-11-10T15:41:13.161Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases 200
+[debug] [2025-11-10T15:41:13.161Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases {"releases":[{"name":"projects/homeboyquant-e5910/releases/cloud.firestore","rulesetName":"projects/homeboyquant-e5910/rulesets/d7da935a-3efa-4385-b8cb-1d2d3f349f30","createTime":"2025-11-10T06:26:55.186896Z","updateTime":"2025-11-10T06:56:23.481940Z"}]}
+[debug] [2025-11-10T15:41:13.162Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:13.162Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:13.163Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets/d7da935a-3efa-4385-b8cb-1d2d3f349f30 [none]
+[debug] [2025-11-10T15:41:13.456Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets/d7da935a-3efa-4385-b8cb-1d2d3f349f30 200
+[debug] [2025-11-10T15:41:13.457Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets/d7da935a-3efa-4385-b8cb-1d2d3f349f30 [omitted]
+[info] i  firestore: uploading rules firestore.rules... 
+[debug] [2025-11-10T15:41:13.458Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:13.458Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:13.459Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets [none]
+[debug] [2025-11-10T15:41:13.459Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets [omitted]
+[debug] [2025-11-10T15:41:14.364Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets 200
+[debug] [2025-11-10T15:41:14.364Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/rulesets {"name":"projects/homeboyquant-e5910/rulesets/1cda71c4-fecf-42d9-847d-7e84d8862c09","source":{"files":[{"content":"rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    // Portfolio documents - one per user\n    match /portfolios/{userId} {\n      // Allow read/write for dogmatic1 (development)\n      allow read, write: if userId == 'dogmatic1' || userId == 'demo_user';\n\n      // For authenticated users (future):\n      // allow read, write: if request.auth != null && request.auth.uid == userId;\n\n      // Subcollections for trades and performance data\n      match /trades/{tradeId} {\n        allow read, write: if userId == 'dogmatic1' || userId == 'demo_user';\n        // allow read, write: if request.auth != null && request.auth.uid == userId;\n      }\n\n      match /performance/{snapshotId} {\n        allow read, write: if userId == 'dogmatic1' || userId == 'demo_user';\n        // allow read, write: if request.auth != null && request.auth.uid == userId;\n      }\n    }\n\n    // Allow test collection for testing\n    match /test_collection/{document} {\n      allow read, write: if true;\n    }\n\n    // Deny all other access by default\n    match /{document=**} {\n      allow read, write: if false;\n    }\n  }\n}","name":"firestore.rules"}]},"createTime":"2025-11-10T15:41:14.332639Z","metadata":{"services":["cloud.firestore"]}}
+[debug] [2025-11-10T15:41:14.364Z] [rules] created ruleset projects/homeboyquant-e5910/rulesets/1cda71c4-fecf-42d9-847d-7e84d8862c09
+[debug] [2025-11-10T15:41:14.364Z] [rules] releasing cloud.firestore/(default) with ruleset projects/homeboyquant-e5910/rulesets/1cda71c4-fecf-42d9-847d-7e84d8862c09
+[debug] [2025-11-10T15:41:14.365Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:14.365Z] Checked if tokens are valid: true, expires at: 1762792867236
+[debug] [2025-11-10T15:41:14.365Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases/cloud.firestore/(default) [none]
+[debug] [2025-11-10T15:41:14.365Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases/cloud.firestore/(default) {"release":{"name":"projects/homeboyquant-e5910/releases/cloud.firestore/(default)","rulesetName":"projects/homeboyquant-e5910/rulesets/1cda71c4-fecf-42d9-847d-7e84d8862c09"}}
+[debug] [2025-11-10T15:41:15.318Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases/cloud.firestore/(default) 200
+[debug] [2025-11-10T15:41:15.319Z] <<< [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/homeboyquant-e5910/releases/cloud.firestore/(default) {"name":"projects/homeboyquant-e5910/releases/cloud.firestore","rulesetName":"projects/homeboyquant-e5910/rulesets/1cda71c4-fecf-42d9-847d-7e84d8862c09","createTime":"2025-11-10T06:26:55.186896Z","updateTime":"2025-11-10T15:41:15.285013Z"}
+[debug] [2025-11-10T15:41:15.319Z] [rules] updated release projects/homeboyquant-e5910/releases/cloud.firestore
+[info] +  firestore: released rules firestore.rules to cloud.firestore 
+[info] 
+[info] +  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/homeboyquant-e5910/overview

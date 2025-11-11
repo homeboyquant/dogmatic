@@ -1,0 +1,574 @@
+/* ===== CLEAN TERMINAL AESTHETIC ===== */
+.container {
+  width: 100%;
+  min-height: calc(100vh - 100px);
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+/* ===== HERO SECTION ===== */
+.heroSection {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.heroContent {
+  max-width: 700px;
+  width: 100%;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  margin-bottom: 32px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.badgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00ff00;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.heroTitle {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.heroSubtitle {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.heroForm {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.inputWrapper {
+  flex: 1;
+  position: relative;
+}
+
+.heroInput {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-family: 'SF Mono', monospace;
+  transition: all 0.2s ease;
+}
+
+.heroInput:focus {
+  outline: none;
+  border-color: var(--text-primary);
+  background: var(--card-bg);
+}
+
+.heroButton {
+  padding: 14px 24px;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: 'SF Mono', monospace;
+}
+
+.heroButton:hover {
+  opacity: 0.85;
+}
+
+.heroButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== TRADING VIEW ===== */
+.tradingView {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.backButton {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-bottom: 24px;
+  font-family: 'SF Mono', monospace;
+}
+
+.backButton:hover {
+  background: var(--bg-secondary);
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
+
+/* ===== PORTFOLIO HEADER ===== */
+.portfolioHeader {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.balanceCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.balanceLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.balanceValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'SF Mono', monospace;
+}
+
+.balanceValue.positive {
+  color: #00ff00;
+}
+
+.balanceValue.negative {
+  color: #ff4444;
+}
+
+.pnlPercent {
+  font-size: 16px;
+  margin-left: 8px;
+  opacity: 0.7;
+}
+
+/* ===== EVENT CARD ===== */
+.eventCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.eventTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.eventDescription {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ===== MARKETS GRID ===== */
+.marketsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.marketCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.marketCard:hover {
+  border-color: var(--text-primary);
+}
+
+.marketQuestion {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.pricesRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.priceBox {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+}
+
+.priceLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.priceValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  font-family: 'SF Mono', monospace;
+}
+
+.positionBadge {
+  font-size: 11px;
+  padding: 4px 8px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tradeButton {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: 'SF Mono', monospace;
+}
+
+.tradeButton:hover {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+}
+
+/* ===== POSITIONS PANEL ===== */
+.positionsPanel {
+  margin-top: 32px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-tertiary);
+  margin-bottom: 16px;
+}
+
+.positionCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.positionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.positionMarket {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.positionSide {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.positionSide.yes {
+  background: #00ff0020;
+  color: #00ff00;
+  border: 1px solid #00ff0040;
+}
+
+.positionSide.no {
+  background: #ff000020;
+  color: #ff4444;
+  border: 1px solid #ff444440;
+}
+
+.positionStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.positionStat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.positionStatLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+}
+
+.positionStatValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'SF Mono', monospace;
+}
+
+.positionStatValue.positive {
+  color: #00ff00;
+}
+
+.positionStatValue.negative {
+  color: #ff4444;
+}
+
+.positive {
+  color: #00ff00;
+}
+
+.negative {
+  color: #ff4444;
+}
+
+/* ===== TRADE MODAL ===== */
+.tradeModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.tradeModalContent {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+}
+
+.tradeModalTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.tradeModalQuestion {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+.tradeForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tradeFormGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tradeLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+}
+
+.tradeInput {
+  padding: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 16px;
+  color: var(--text-primary);
+  font-family: 'SF Mono', monospace;
+}
+
+.tradeInput:focus {
+  outline: none;
+  border-color: var(--text-primary);
+}
+
+.tradeSummary {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.tradeSummaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 4px 0;
+  color: var(--text-secondary);
+}
+
+.tradeSummaryRow span:last-child {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'SF Mono', monospace;
+}
+
+.tradeButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.tradeActionButton {
+  padding: 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: 'SF Mono', monospace;
+}
+
+.tradeActionButton.buy {
+  background: #00ff00;
+  color: #000000;
+}
+
+.tradeActionButton.buy:hover {
+  background: #00cc00;
+}
+
+.tradeActionButton.sell {
+  background: #ff4444;
+  color: #ffffff;
+}
+
+.tradeActionButton.sell:hover {
+  background: #cc0000;
+}
+
+.closeModal {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.closeModal:hover {
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 36px;
+  }
+
+  .heroForm {
+    flex-direction: column;
+  }
+
+  .marketsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .portfolioHeader {
+    grid-template-columns: 1fr;
+  }
+
+  .positionStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

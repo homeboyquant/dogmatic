@@ -1,0 +1,286 @@
+import { useState, useEffect } from 'react';
+import { Position } from '@/types/trading';
+import styles from './Portfolio.module.css';
+
+interface PortfolioPosition {
+  id: string;
+  question: string;
+  outcome: 'yes' | 'no';
+  entryPrice: number;
+  shares: number;
+  marketSlug: string;
+  thesis?: string;
+  eventImage?: string;
+}
+
+interface PortfolioProps {
+  positions: PortfolioPosition[];
+  balance: number;
+  onClose: (position: PortfolioPosition) => void;
+  onUpdateThesis: (positionId: string, thesis: string) => void;
+}
+
+export default function Portfolio({ positions, balance, onClose, onUpdateThesis }: PortfolioProps) {
+  const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({});
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [editingThesisId, setEditingThesisId] = useState<string | null>(null);
+  const [editThesisValue, setEditThesisValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch prices function
+  const fetchPrices = async () => {
+    if (positions.length === 0) return;
+
+    setIsLoading(true);
+    console.log('🔄 Fetching prices for', positions.length, 'positions at', new Date().toLocaleTimeString());
+
+    try {
+      // Use proxy API to avoid CORS issues
+      const response = await fetch('/api/fetch-prices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ positions }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.prices) {
+        setCurrentPrices(data.prices);
+
+        // Log individual price updates
+        positions.forEach(position => {
+          const newPrice = data.prices[position.id];
+          if (newPrice !== position.entryPrice) {
+            console.log(`✅ ${position.question.substring(0, 30)}... ${position.outcome.toUpperCase()}: $${newPrice.toFixed(3)}`);
+          }
+        });
+      } else {
+        console.error('❌ Failed to fetch prices:', data.error);
+        // Fallback to entry prices
+        const fallbackPrices: Record<string, number> = {};
+        positions.forEach(pos => {
+          fallbackPrices[pos.id] = pos.entryPrice;
+        });
+        setCurrentPrices(fallbackPrices);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching prices:', error);
+      // Fallback to entry prices
+      const fallbackPrices: Record<string, number> = {};
+      positions.forEach(pos => {
+        fallbackPrices[pos.id] = pos.entryPrice;
+      });
+      setCurrentPrices(fallbackPrices);
+    }
+
+    setLastUpdate(new Date());
+    setIsLoading(false);
+    console.log('✅ Price update complete at', new Date().toLocaleTimeString());
+  };
+
+  // Initial fetch and interval
+  useEffect(() => {
+    if (positions.length > 0) {
+      console.log('📊 Portfolio mounted with', positions.length, 'positions');
+      fetchPrices();
+
+      // Refresh every 30 seconds
+      const interval = setInterval(() => {
+        console.log('⏰ Auto-refresh triggered');
+        fetchPrices();
+      }, 30000);
+
+      return () => {
+        console.log('🛑 Clearing price update interval');
+        clearInterval(interval);
+      };
+    }
+  }, [positions]);
+
+  const calculatePnL = (position: PortfolioPosition) => {
+    const currentPrice = currentPrices[position.id] || position.entryPrice;
+    const priceDiff = currentPrice - position.entryPrice;
+    const pnl = priceDiff * position.shares;
+    const pnlPercent = (priceDiff / position.entryPrice) * 100;
+
+    return { pnl, pnlPercent, currentPrice };
+  };
+
+  const totalPnL = positions.reduce((sum, pos) => {
+    const { pnl } = calculatePnL(pos);
+    return sum + pnl;
+  }, 0);
+
+  const totalValue = positions.reduce((sum, pos) => {
+    const { currentPrice } = calculatePnL(pos);
+    return sum + (currentPrice * pos.shares);
+  }, 0);
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Portfolio</h1>
+        <div className={styles.headerActions}>
+          <button
+            className={styles.refreshButton}
+            onClick={fetchPrices}
+            disabled={isLoading}
+          >
+            <svg
+              className={`${styles.refreshIcon} ${isLoading ? styles.spinning : ''}`}
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+            >
+              <path
+                d="M13.65 2.35A7.958 7.958 0 008 0a8 8 0 100 16 7.938 7.938 0 005.308-2.036l-1.416-1.414A5.98 5.98 0 018 14a6 6 0 116-6h-2l3-3 3 3h-2a8 8 0 01-2.35 5.65z"
+                fill="currentColor"
+              />
+            </svg>
+            {isLoading ? 'Updating...' : 'Refresh Prices'}
+          </button>
+          <div className={styles.lastUpdate}>
+            Last updated: {lastUpdate.toLocaleTimeString()}
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.summary}>
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryLabel}>Cash Balance</div>
+          <div className={styles.summaryValue}>${balance.toFixed(2)}</div>
+        </div>
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryLabel}>Positions Value</div>
+          <div className={styles.summaryValue}>${totalValue.toFixed(2)}</div>
+        </div>
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryLabel}>Total P&L</div>
+          <div className={`${styles.summaryValue} ${totalPnL >= 0 ? styles.positive : styles.negative}`}>
+            {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(2)}
+          </div>
+        </div>
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryLabel}>Total Portfolio</div>
+          <div className={styles.summaryValue}>${(balance + totalValue).toFixed(2)}</div>
+        </div>
+      </div>
+
+      <div className={styles.positions}>
+        {positions.length === 0 ? (
+          <div className={styles.empty}>
+            <div className={styles.emptyIcon}>📊</div>
+            <div className={styles.emptyText}>No open positions</div>
+            <div className={styles.emptySubtext}>Start trading to build your portfolio</div>
+          </div>
+        ) : (
+          positions.map((position) => {
+            const { pnl, pnlPercent, currentPrice } = calculatePnL(position);
+
+            return (
+              <div key={position.id} className={styles.positionCard}>
+                <div className={styles.positionHeader}>
+                  {position.eventImage && (
+                    <img src={position.eventImage} alt="" className={styles.eventImage} />
+                  )}
+                  <div className={styles.positionHeaderContent}>
+                    <div className={styles.positionQuestion}>{position.question}</div>
+                    <div className={`${styles.positionOutcome} ${position.outcome === 'yes' ? styles.yes : styles.no}`}>
+                      {position.outcome.toUpperCase()}
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.positionDetails}>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Entry Price</span>
+                    <span className={styles.detailValue}>${position.entryPrice.toFixed(3)}</span>
+                  </div>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Current Price</span>
+                    <span className={styles.detailValue}>${currentPrice.toFixed(3)}</span>
+                  </div>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Shares</span>
+                    <span className={styles.detailValue}>{position.shares.toFixed(2)}</span>
+                  </div>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Cost Basis</span>
+                    <span className={styles.detailValue}>${(position.entryPrice * position.shares).toFixed(2)}</span>
+                  </div>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Current Value</span>
+                    <span className={styles.detailValue}>${(currentPrice * position.shares).toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <div className={styles.positionThesis}>
+                  <div className={styles.thesisHeader}>
+                    <div className={styles.thesisLabel}>Trade Thesis</div>
+                    {editingThesisId !== position.id && (
+                      <button
+                        className={styles.editThesisButton}
+                        onClick={() => {
+                          setEditingThesisId(position.id);
+                          setEditThesisValue(position.thesis || '');
+                        }}
+                      >
+                        {position.thesis ? 'Edit' : 'Add'}
+                      </button>
+                    )}
+                  </div>
+                  {editingThesisId === position.id ? (
+                    <div className={styles.thesisEditForm}>
+                      <textarea
+                        className={styles.thesisTextarea}
+                        value={editThesisValue}
+                        onChange={(e) => setEditThesisValue(e.target.value)}
+                        placeholder="Enter your trade thesis..."
+                        rows={3}
+                        autoFocus
+                      />
+                      <div className={styles.thesisEditActions}>
+                        <button
+                          className={styles.saveThesisButton}
+                          onClick={() => {
+                            onUpdateThesis(position.id, editThesisValue);
+                            setEditingThesisId(null);
+                          }}
+                        >
+                          Save
+                        </button>
+                        <button
+                          className={styles.cancelThesisButton}
+                          onClick={() => setEditingThesisId(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={styles.thesisText}>
+                      {position.thesis || 'No thesis added yet'}
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.positionPnL}>
+                  <div className={`${styles.pnlValue} ${pnl >= 0 ? styles.positive : styles.negative}`}>
+                    {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} ({pnl >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
+                  </div>
+                  <button
+                    className={styles.closeButton}
+                    onClick={() => onClose(position)}
+                  >
+                    Close Position
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
