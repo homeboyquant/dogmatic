@@ -18,6 +18,11 @@ export interface Market {
   slug: string;
   market_slug: string;
   enableOrderBook: boolean;
+  bestBid?: string;
+  bestAsk?: string;
+  lastTradePrice?: string;
+  clobTokenIds?: string[];
+  tokens?: Array<{ token_id: string }>;
 }
 
 export interface Event {

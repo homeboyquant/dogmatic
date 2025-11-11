@@ -14,6 +14,9 @@ interface Market {
   outcomes: string; // JSON string like "[\"Yes\", \"No\"]"
   tokens?: { token_id: string; outcome: string }[]; // Token IDs for orderbook
   clobTokenIds?: string[]; // Alternative format for token IDs
+  bestBid?: string;
+  bestAsk?: string;
+  lastTradePrice?: string;
 }
 
 interface OrderBook {
@@ -276,28 +279,28 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
   }, [event, orderbooks]);
 
   const getBestPrice = (market: Market, side: 'YES' | 'NO', action: 'BUY' | 'SELL'): number => {
+    // First, try to use bestBid/bestAsk from market data (most reliable)
+    if (action === 'BUY' && market.bestAsk !== undefined) {
+      return parseFloat(market.bestAsk);
+    }
+    if (action === 'SELL' && market.bestBid !== undefined) {
+      return parseFloat(market.bestBid);
+    }
+
+    // Second, try orderbook data
     const orderbookKey = `${market.id}_${side}`;
     const orderbook = orderbooks[orderbookKey];
 
-    if (!orderbook) {
-      // Fallback to mid price
-      const prices = JSON.parse(market.outcomePrices);
-      return side === 'YES' ? parseFloat(prices[0]) : parseFloat(prices[1]);
-    }
-
-    // For BUY, use best ask (lowest ask price)
-    // For SELL, use best bid (highest bid price)
-    if (action === 'BUY') {
-      if (orderbook.asks && orderbook.asks.length > 0) {
+    if (orderbook) {
+      if (action === 'BUY' && orderbook.asks && orderbook.asks.length > 0) {
         return parseFloat(orderbook.asks[0].price);
       }
-    } else {
-      if (orderbook.bids && orderbook.bids.length > 0) {
+      if (action === 'SELL' && orderbook.bids && orderbook.bids.length > 0) {
         return parseFloat(orderbook.bids[0].price);
       }
     }
 
-    // Fallback to mid price if no orderbook data
+    // Fallback to mid price if no bid/ask data available
     const prices = JSON.parse(market.outcomePrices);
     return side === 'YES' ? parseFloat(prices[0]) : parseFloat(prices[1]);
   };

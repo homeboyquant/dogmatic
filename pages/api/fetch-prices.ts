@@ -15,27 +15,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const priceMap: Record<string, number> = {};
 
     for (const position of positions) {
+      const fallbackPrice = position.avgPrice || position.currentPrice || 0;
+
       if (!position.marketSlug) {
-        priceMap[position.id] = position.entryPrice;
+        priceMap[position.id] = fallbackPrice;
         continue;
       }
 
       try {
+        // Fetch market data directly using market slug
         const response = await fetch(`https://gamma-api.polymarket.com/markets?slug=${position.marketSlug}`);
         const data = await response.json();
 
         if (data.length > 0) {
           const market = data[0];
-          const outcomeIndex = position.outcome === 'yes' ? 0 : 1;
-          const prices = JSON.parse(market.outcomePrices);
-          const newPrice = parseFloat(prices[outcomeIndex]);
-          priceMap[position.id] = newPrice;
+
+          if (market && market.bestBid !== undefined) {
+            // Always use bestBid for current value (what you can sell for right now)
+            // This applies to both YES and NO positions
+            const newPrice = parseFloat(market.bestBid);
+            priceMap[position.id] = newPrice;
+            console.log(`✅ ${position.marketQuestion}: bestBid=$${newPrice}`);
+          } else {
+            // Fallback to entry price if no bid/ask available
+            priceMap[position.id] = fallbackPrice;
+          }
         } else {
-          priceMap[position.id] = position.entryPrice;
+          priceMap[position.id] = fallbackPrice;
         }
       } catch (error) {
         console.error('Error fetching price for', position.marketSlug, ':', error);
-        priceMap[position.id] = position.entryPrice;
+        priceMap[position.id] = fallbackPrice;
       }
     }
 
