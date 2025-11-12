@@ -645,7 +645,7 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
       {/* Portfolio stats bar */}
       <div className={styles.statsBar}>
         <div className={styles.statCard}>
-          <div className={styles.statLabel}>Balance</div>
+          <div className={styles.statLabel}>Cash Balance</div>
           <div className={styles.statValue}>${portfolio.balance.toFixed(2)}</div>
         </div>
         <div className={styles.statCard}>
