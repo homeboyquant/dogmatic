@@ -29,15 +29,56 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         if (data.length > 0) {
           const market = data[0];
+          let priceFound = false;
 
-          if (market && market.bestBid !== undefined) {
-            // Always use bestBid for current value (what you can sell for right now)
-            // This applies to both YES and NO positions
+          // Priority 1: Try to get orderbook price (most accurate for active markets)
+          if (market.clobTokenIds && position.marketId) {
+            try {
+              const tokenIds = typeof market.clobTokenIds === 'string'
+                ? JSON.parse(market.clobTokenIds)
+                : market.clobTokenIds;
+
+              // Get token ID for the position's side
+              const tokenIndex = position.outcome === 'yes' ? 0 : 1;
+              const tokenId = tokenIds[tokenIndex];
+
+              if (tokenId) {
+                const obResponse = await fetch(`https://clob.polymarket.com/book?token_id=${tokenId}`);
+                if (obResponse.ok) {
+                  const orderbook = await obResponse.json();
+                  // Use best bid (what you can sell for)
+                  if (orderbook.bids && orderbook.bids.length > 0) {
+                    priceMap[position.id] = parseFloat(orderbook.bids[0].price);
+                    console.log(`✅ ${position.marketQuestion} (${position.outcome}): orderbook bid=$${orderbook.bids[0].price}`);
+                    priceFound = true;
+                  }
+                }
+              }
+            } catch (obError) {
+              console.log(`⚠️ Orderbook not available for ${position.marketQuestion}`);
+            }
+          }
+
+          // Priority 2: Use bestBid from market data if orderbook failed
+          if (!priceFound && market.bestBid !== undefined) {
             const newPrice = parseFloat(market.bestBid);
             priceMap[position.id] = newPrice;
             console.log(`✅ ${position.marketQuestion}: bestBid=$${newPrice}`);
-          } else {
-            // Fallback to entry price if no bid/ask available
+            priceFound = true;
+          }
+
+          // Priority 3: Use outcomePrices (for resolved/closed markets)
+          if (!priceFound && market.outcomePrices) {
+            const prices = JSON.parse(market.outcomePrices);
+            const priceIndex = position.outcome === 'yes' ? 0 : 1;
+            const outcomePrice = parseFloat(prices[priceIndex]);
+            priceMap[position.id] = outcomePrice;
+            console.log(`✅ ${position.marketQuestion} (${position.outcome}): outcomePrice=$${outcomePrice} (market likely resolved)`);
+            priceFound = true;
+          }
+
+          // Final fallback: use entry price
+          if (!priceFound) {
             priceMap[position.id] = fallbackPrice;
           }
         } else {
