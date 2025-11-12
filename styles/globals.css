@@ -6,6 +6,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Space';
+  src: url('/space.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root[data-theme='light'] {
   --bg-primary: #FAFAFA;
   --bg-secondary: #FFFFFF;
