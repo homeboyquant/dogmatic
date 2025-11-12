@@ -13,6 +13,7 @@ interface PortfolioPosition {
   eventImage?: string;
   closed?: boolean;
   exitPrice?: number;
+  polymarketUrl?: string;
 }
 
 interface PortfolioProps {
@@ -20,13 +21,16 @@ interface PortfolioProps {
   balance: number;
   onClose: (position: PortfolioPosition) => void;
   onUpdateThesis: (positionId: string, thesis: string) => void;
+  onUpdatePolymarketUrl: (positionId: string, url: string) => void;
 }
 
-export default function Portfolio({ positions, balance, onClose, onUpdateThesis }: PortfolioProps) {
+export default function Portfolio({ positions, balance, onClose, onUpdateThesis, onUpdatePolymarketUrl }: PortfolioProps) {
   const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({});
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [editingThesisId, setEditingThesisId] = useState<string | null>(null);
   const [editThesisValue, setEditThesisValue] = useState('');
+  const [editingUrlId, setEditingUrlId] = useState<string | null>(null);
+  const [editUrlValue, setEditUrlValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showClosed, setShowClosed] = useState(false);
 
@@ -220,7 +224,9 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis 
                     <img src={position.eventImage} alt="" className={styles.eventImage} />
                   )}
                   <div className={styles.positionHeaderContent}>
-                    <div className={styles.positionQuestion}>{position.question}</div>
+                    <div className={styles.positionQuestion}>
+                      {position.question}
+                    </div>
                     <div className={`${styles.positionOutcome} ${position.outcome === 'yes' ? styles.yes : styles.no}`}>
                       {position.outcome.toUpperCase()}
                     </div>
@@ -307,14 +313,93 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis 
                     {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} ({pnl >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
                   </div>
                   {!position.closed && (
-                    <button
-                      className={styles.closeButton}
-                      onClick={() => onClose(position)}
-                    >
-                      Close Position
-                    </button>
+                    <div className={styles.positionActions}>
+                      {position.polymarketUrl ? (
+                        <a
+                          href={position.polymarketUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.viewOnPolymarketButton}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                          </svg>
+                          View on Polymarket
+                        </a>
+                      ) : (
+                        <button
+                          className={styles.addPolymarketLinkButton}
+                          onClick={() => {
+                            setEditingUrlId(position.id);
+                            setEditUrlValue('');
+                          }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                          </svg>
+                          Add Polymarket Link
+                        </button>
+                      )}
+                      <button
+                        className={styles.closeButton}
+                        onClick={() => onClose(position)}
+                      >
+                        Close Position
+                      </button>
+                    </div>
                   )}
                 </div>
+
+                {editingUrlId === position.id && (
+                  <div className={styles.linkEditModal}>
+                    <div className={styles.linkEditHeader}>
+                      <h4>Add Polymarket Link</h4>
+                      <button
+                        className={styles.closeModalButton}
+                        onClick={() => {
+                          setEditingUrlId(null);
+                          setEditUrlValue('');
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <input
+                      type="url"
+                      className={styles.linkInput}
+                      value={editUrlValue}
+                      onChange={(e) => setEditUrlValue(e.target.value)}
+                      placeholder="https://polymarket.com/event/..."
+                      autoFocus
+                    />
+                    <div className={styles.linkEditActions}>
+                      <button
+                        className={styles.saveLinkButton}
+                        onClick={() => {
+                          if (editUrlValue.trim()) {
+                            onUpdatePolymarketUrl(position.id, editUrlValue.trim());
+                          }
+                          setEditingUrlId(null);
+                          setEditUrlValue('');
+                        }}
+                      >
+                        Save Link
+                      </button>
+                      <button
+                        className={styles.cancelLinkButton}
+                        onClick={() => {
+                          setEditingUrlId(null);
+                          setEditUrlValue('');
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })

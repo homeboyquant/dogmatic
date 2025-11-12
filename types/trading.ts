@@ -4,6 +4,7 @@ export interface Position {
   marketQuestion: string;
   marketSlug?: string; // Market slug for fetching updates
   eventImage?: string; // Event image URL
+  polymarketUrl?: string; // Full Polymarket URL for this market
   side: 'YES' | 'NO';
   shares: number;
   avgPrice: number; // Price per share (0-1)

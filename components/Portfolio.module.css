@@ -234,6 +234,161 @@
   line-height: 1.4;
   flex: 1;
   font-family: 'Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.linkEditModal {
+  margin-top: 16px;
+  padding: 20px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.linkEditHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.linkEditHeader h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: 'Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.closeModalButton {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.closeModalButton:hover {
+  color: var(--text-primary);
+  transform: rotate(90deg);
+}
+
+.linkInput {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  margin-bottom: 12px;
+  font-family: 'Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.linkInput:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.linkEditActions {
+  display: flex;
+  gap: 10px;
+}
+
+.saveLinkButton,
+.cancelLinkButton {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: 'Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.saveLinkButton {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.saveLinkButton:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.cancelLinkButton {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.cancelLinkButton:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-tertiary);
+}
+
+.addPolymarketLinkButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(35, 131, 226, 0.08);
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgb(35, 131, 226);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica', 'Arial', sans-serif;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+
+.addPolymarketLinkButton svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+  transition: opacity 0.15s ease;
+  opacity: 0.7;
+}
+
+.addPolymarketLinkButton:hover {
+  background: rgba(35, 131, 226, 0.12);
+  color: rgb(25, 111, 186);
+}
+
+.addPolymarketLinkButton:hover svg {
+  opacity: 1;
+}
+
+.addPolymarketLinkButton:active {
+  background: rgba(35, 131, 226, 0.16);
 }
 
 .positionOutcome {
@@ -430,6 +585,12 @@
   color: #ef4444;
 }
 
+.positionActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .closeButton {
   background: transparent;
   border: 1px solid var(--border-color);
@@ -450,6 +611,47 @@
 
 .closeButton:active {
   transform: scale(0.98);
+}
+
+.viewOnPolymarketButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(35, 131, 226, 0.08);
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgb(35, 131, 226);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica', 'Arial', sans-serif;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+
+.viewOnPolymarketButton svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+  transition: transform 0.15s ease;
+  opacity: 0.7;
+}
+
+.viewOnPolymarketButton:hover {
+  background: rgba(35, 131, 226, 0.12);
+  color: rgb(25, 111, 186);
+}
+
+.viewOnPolymarketButton:hover svg {
+  opacity: 1;
+}
+
+.viewOnPolymarketButton:active {
+  background: rgba(35, 131, 226, 0.16);
 }
 
 @media (max-width: 768px) {
@@ -485,7 +687,18 @@
     align-items: stretch;
   }
 
+  .positionActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
   .closeButton {
     width: 100%;
+  }
+
+  .viewOnPolymarketButton,
+  .addPolymarketLinkButton {
+    width: 100%;
+    justify-content: center;
   }
 }
