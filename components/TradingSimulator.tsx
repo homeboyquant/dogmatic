@@ -609,6 +609,7 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
     thesis: pos.thesis,
     eventImage: pos.eventImage || event?.image || '',
     closed: pos.closed,
+    exitPrice: pos.exitPrice,
   }));
 
   if (currentView === 'portfolio') {

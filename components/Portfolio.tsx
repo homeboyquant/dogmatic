@@ -12,6 +12,7 @@ interface PortfolioPosition {
   thesis?: string;
   eventImage?: string;
   closed?: boolean;
+  exitPrice?: number;
 }
 
 interface PortfolioProps {
@@ -100,7 +101,11 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis 
   }, [positions]);
 
   const calculatePnL = (position: PortfolioPosition) => {
-    const currentPrice = currentPrices[position.id] || position.entryPrice;
+    // For closed positions, use exitPrice. For open positions, use fetched current price
+    const currentPrice = position.closed && position.exitPrice
+      ? position.exitPrice
+      : (currentPrices[position.id] || position.entryPrice);
+
     const priceDiff = currentPrice - position.entryPrice;
     const pnl = priceDiff * position.shares;
     const pnlPercent = (priceDiff / position.entryPrice) * 100;
