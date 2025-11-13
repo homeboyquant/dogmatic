@@ -534,8 +534,20 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
           const market = data[0];
           let priceFound = false;
 
-          // Priority 1: Try to get orderbook bestBid (most accurate sell price)
-          if (market.clobTokenIds) {
+          // Priority 1: Use bestBid from market data (most reliable)
+          if (market.bestBid !== undefined) {
+            if (portfolioPosition.outcome === 'yes') {
+              currentPrice = parseFloat(market.bestBid);
+            } else {
+              // For NO positions, invert the YES bestAsk
+              currentPrice = market.bestAsk ? (1 - parseFloat(market.bestAsk)) : (1 - parseFloat(market.bestBid));
+            }
+            console.log(`✅ Closing ${portfolioPosition.outcome} position at market bestBid: $${currentPrice}`);
+            priceFound = true;
+          }
+
+          // Priority 2: Try orderbook if market bestBid not available
+          if (!priceFound && market.clobTokenIds) {
             try {
               const tokenIds = typeof market.clobTokenIds === 'string'
                 ? JSON.parse(market.clobTokenIds)
@@ -556,20 +568,8 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
                 }
               }
             } catch (obError) {
-              console.log(`⚠️ Orderbook not available, trying bestBid`);
+              console.log(`⚠️ Orderbook not available, trying outcomePrices`);
             }
-          }
-
-          // Priority 2: Use bestBid from market data
-          if (!priceFound && market.bestBid !== undefined) {
-            if (portfolioPosition.outcome === 'yes') {
-              currentPrice = parseFloat(market.bestBid);
-            } else {
-              // For NO positions, invert the YES bestAsk
-              currentPrice = market.bestAsk ? (1 - parseFloat(market.bestAsk)) : parseFloat(market.bestBid);
-            }
-            console.log(`✅ Closing ${portfolioPosition.outcome} position at bestBid: $${currentPrice}`);
-            priceFound = true;
           }
 
           // Priority 3: Fallback to outcomePrices
