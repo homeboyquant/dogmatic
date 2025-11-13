@@ -141,10 +141,21 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
       console.log('💾 Saving portfolio - trades:', portfolio.trades?.length || 0, ', balance:', portfolio.balance);
       const savePortfolio = async () => {
         try {
+          console.log('📤 Attempting to save portfolio to Firestore...', {
+            userId,
+            positionsCount: portfolio.positions.length,
+            tradesCount: portfolio.trades.length,
+            balance: portfolio.balance,
+          });
           await portfolioService.savePortfolio(userId, portfolio);
-          console.log('✅ Portfolio saved successfully');
+          console.log('✅ Portfolio saved successfully to Firestore');
         } catch (error) {
           console.error('❌ Error saving portfolio:', error);
+          console.error('Portfolio data that failed to save:', {
+            userId,
+            positionsCount: portfolio.positions.length,
+            balance: portfolio.balance,
+          });
         }
       };
       savePortfolio();

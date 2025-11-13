@@ -31,18 +31,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const market = data[0];
           let priceFound = false;
 
-          // Calculate expected price from market bestBid/bestAsk first
-          let expectedPrice = 0;
+          // Priority 1: Use bestBid/bestAsk from market data (most reliable)
           if (market.bestBid !== undefined && market.bestAsk !== undefined) {
+            let sellPrice;
             if (position.outcome === 'yes') {
-              expectedPrice = parseFloat(market.bestBid);
+              sellPrice = parseFloat(market.bestBid);
             } else {
-              expectedPrice = 1 - parseFloat(market.bestAsk);
+              sellPrice = 1 - parseFloat(market.bestAsk);
             }
+            priceMap[position.id] = sellPrice;
+            console.log(`✅ ${position.marketQuestion} (${position.outcome}): bestBid/ask sell price=${sellPrice.toFixed(3)}`);
+            priceFound = true;
           }
 
-          // Priority 1: Try orderbook, but validate against market bestBid
-          if (market.clobTokenIds && position.marketId) {
+          // Priority 2: Fallback to orderbook if bestBid not available
+          if (!priceFound && market.clobTokenIds && position.marketId) {
             try {
               const tokenIds = typeof market.clobTokenIds === 'string'
                 ? JSON.parse(market.clobTokenIds)
@@ -57,41 +60,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                   const orderbook = await obResponse.json();
                   if (orderbook.bids && orderbook.bids.length > 0) {
                     const obPrice = parseFloat(orderbook.bids[0].price);
-
-                    // Compare orderbook price with expected market price
-                    if (expectedPrice > 0) {
-                      const priceDiff = Math.abs(obPrice - expectedPrice);
-                      const percentDiff = (priceDiff / expectedPrice) * 100;
-
-                      // If difference is > 10%, use market bestBid instead
-                      if (percentDiff > 10) {
-                        console.log(`⚠️ Orderbook price (${obPrice}) differs from market bestBid (${expectedPrice.toFixed(3)}) by ${percentDiff.toFixed(1)}% - using bestBid`);
-                        priceMap[position.id] = expectedPrice;
-                        priceFound = true;
-                      } else {
-                        priceMap[position.id] = obPrice;
-                        console.log(`✅ ${position.marketQuestion} (${position.outcome}): orderbook bid=${obPrice}`);
-                        priceFound = true;
-                      }
-                    } else {
-                      // No market price to compare, use orderbook
-                      priceMap[position.id] = obPrice;
-                      console.log(`✅ ${position.marketQuestion} (${position.outcome}): orderbook bid=${obPrice}`);
-                      priceFound = true;
-                    }
+                    priceMap[position.id] = obPrice;
+                    console.log(`✅ ${position.marketQuestion} (${position.outcome}): orderbook fallback bid=${obPrice}`);
+                    priceFound = true;
                   }
                 }
               }
             } catch (obError) {
               console.log(`⚠️ Orderbook not available for ${position.marketQuestion}`);
             }
-          }
-
-          // Priority 2: Use bestBid/bestAsk from market data if orderbook failed
-          if (!priceFound && expectedPrice > 0) {
-            priceMap[position.id] = expectedPrice;
-            console.log(`✅ ${position.marketQuestion} (${position.outcome}): market sell price=${expectedPrice.toFixed(3)}`);
-            priceFound = true;
           }
 
           // Priority 3: Use outcomePrices (for resolved/closed markets)
