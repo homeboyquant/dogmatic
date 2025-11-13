@@ -14,6 +14,7 @@ interface PortfolioPosition {
   closed?: boolean;
   exitPrice?: number;
   polymarketUrl?: string;
+  exitNotes?: string;
 }
 
 interface PortfolioProps {
@@ -22,15 +23,18 @@ interface PortfolioProps {
   onClose: (position: PortfolioPosition) => void;
   onUpdateThesis: (positionId: string, thesis: string) => void;
   onUpdatePolymarketUrl: (positionId: string, url: string) => void;
+  onUpdateExitNotes: (positionId: string, notes: string) => void;
 }
 
-export default function Portfolio({ positions, balance, onClose, onUpdateThesis, onUpdatePolymarketUrl }: PortfolioProps) {
+export default function Portfolio({ positions, balance, onClose, onUpdateThesis, onUpdatePolymarketUrl, onUpdateExitNotes }: PortfolioProps) {
   const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({});
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [editingThesisId, setEditingThesisId] = useState<string | null>(null);
   const [editThesisValue, setEditThesisValue] = useState('');
   const [editingUrlId, setEditingUrlId] = useState<string | null>(null);
   const [editUrlValue, setEditUrlValue] = useState('');
+  const [editingExitNotesId, setEditingExitNotesId] = useState<string | null>(null);
+  const [editExitNotesValue, setEditExitNotesValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showClosed, setShowClosed] = useState(false);
 
@@ -307,6 +311,56 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis,
                     </div>
                   )}
                 </div>
+
+                {position.closed && (
+                  <div className={styles.exitNotesSection}>
+                    <div className={styles.thesisHeader}>
+                      <div className={styles.thesisLabel}>EXIT NOTES</div>
+                      <button
+                        className={styles.editThesisButton}
+                        onClick={() => {
+                          setEditingExitNotesId(position.id);
+                          setEditExitNotesValue(position.exitNotes || '');
+                        }}
+                      >
+                        {position.exitNotes ? 'Edit' : 'Add'}
+                      </button>
+                    </div>
+                    {editingExitNotesId === position.id ? (
+                      <div className={styles.thesisEditForm}>
+                        <textarea
+                          className={styles.thesisTextarea}
+                          value={editExitNotesValue}
+                          onChange={(e) => setEditExitNotesValue(e.target.value)}
+                          placeholder="Why did you exit this position?"
+                          rows={3}
+                          autoFocus
+                        />
+                        <div className={styles.thesisEditActions}>
+                          <button
+                            className={styles.saveThesisButton}
+                            onClick={() => {
+                              onUpdateExitNotes(position.id, editExitNotesValue);
+                              setEditingExitNotesId(null);
+                            }}
+                          >
+                            Save
+                          </button>
+                          <button
+                            className={styles.cancelThesisButton}
+                            onClick={() => setEditingExitNotesId(null)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className={styles.thesisText}>
+                        {position.exitNotes || 'No exit notes added yet'}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className={styles.positionPnL}>
                   <div className={`${styles.pnlValue} ${pnl >= 0 ? styles.positive : styles.negative}`}>

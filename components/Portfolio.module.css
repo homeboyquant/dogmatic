@@ -562,6 +562,18 @@
   border-color: var(--text-tertiary);
 }
 
+.exitNotesSection {
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+}
+
+:root[data-theme='dark'] .exitNotesSection {
+  background: rgba(255, 255, 255, 0.02);
+}
+
 .positionPnL {
   display: flex;
   justify-content: space-between;

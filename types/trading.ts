@@ -18,6 +18,7 @@ export interface Position {
   closed?: boolean; // Whether position has been closed
   closedAt?: number; // Timestamp when position was closed
   exitPrice?: number; // Price at which position was closed
+  exitNotes?: string; // Notes explaining why the position was closed
 }
 
 export interface Trade {

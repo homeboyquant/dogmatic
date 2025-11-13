@@ -132,7 +132,7 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
     // Only save if trades or positions array changed (not just price updates)
     const currentSnapshot = JSON.stringify({
       balance: portfolio.balance,
-      positions: portfolio.positions.map(p => ({ id: p.id, shares: p.shares, cost: p.cost, thesis: p.thesis, polymarketUrl: p.polymarketUrl })),
+      positions: portfolio.positions.map(p => ({ id: p.id, shares: p.shares, cost: p.cost, thesis: p.thesis, polymarketUrl: p.polymarketUrl, exitNotes: p.exitNotes })),
       trades: portfolio.trades,
     });
 
@@ -646,6 +646,15 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
     }));
   };
 
+  const handleUpdateExitNotes = (positionId: string, notes: string) => {
+    setPortfolio(prev => ({
+      ...prev,
+      positions: prev.positions.map(p =>
+        p.id === positionId ? { ...p, exitNotes: notes } : p
+      ),
+    }));
+  };
+
   const getPositionForMarket = (market: Market, side: 'YES' | 'NO') => {
     return portfolio.positions.find(p => p.marketId === market.id && p.side === side);
   };
@@ -663,10 +672,11 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
     closed: pos.closed,
     exitPrice: pos.exitPrice,
     polymarketUrl: pos.polymarketUrl,
+    exitNotes: pos.exitNotes,
   }));
 
   if (currentView === 'portfolio') {
-    return <Portfolio positions={convertedPositions} balance={portfolio.balance} onClose={handleClosePosition} onUpdateThesis={handleUpdateThesis} onUpdatePolymarketUrl={handleUpdatePolymarketUrl} />;
+    return <Portfolio positions={convertedPositions} balance={portfolio.balance} onClose={handleClosePosition} onUpdateThesis={handleUpdateThesis} onUpdatePolymarketUrl={handleUpdatePolymarketUrl} onUpdateExitNotes={handleUpdateExitNotes} />;
   }
 
   return (
