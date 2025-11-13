@@ -528,75 +528,40 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
   };
 
   const handleClosePosition = async (portfolioPosition: { id: string; question: string; outcome: 'yes' | 'no'; entryPrice: number; shares: number; marketSlug: string }) => {
+    console.log('🔄 Starting close position process...', {
+      id: portfolioPosition.id,
+      question: portfolioPosition.question,
+      outcome: portfolioPosition.outcome,
+      currentPriceFromState: currentPrices[portfolioPosition.id],
+    });
+
     // Find the actual position in the portfolio
     const position = portfolio.positions.find(p => p.id === portfolioPosition.id);
     if (!position) {
       console.error('❌ Position not found:', portfolioPosition.id);
+      alert('❌ Error: Position not found in portfolio');
       return;
     }
 
-    // Fetch current market price from API using bestBid (sell price)
-    let currentPrice = position.avgPrice; // Fallback to entry price
+    // Use the currentPrice from state (already fetched by fetch-prices API)
+    // This is the same price shown in the UI and uses bestBid/bestAsk priority
+    const currentPrice = currentPrices[portfolioPosition.id] || position.currentPrice || position.avgPrice;
 
-    if (portfolioPosition.marketSlug) {
-      try {
-        const response = await fetch(`https://gamma-api.polymarket.com/markets?slug=${portfolioPosition.marketSlug}`);
-        const data = await response.json();
+    console.log(`✅ Using current price from state: $${currentPrice.toFixed(3)} for ${portfolioPosition.question} (${portfolioPosition.outcome})`);
 
-        if (data.length > 0) {
-          const market = data[0];
-          let priceFound = false;
+    if (currentPrice === position.avgPrice) {
+      console.warn('⚠️ WARNING: Using entry price as fallback. Current price not available.');
+      const confirmClose = confirm(
+        `⚠️ WARNING: Market price unavailable\n\n` +
+        `Position: ${portfolioPosition.question}\n` +
+        `Using entry price: $${position.avgPrice.toFixed(3)}\n\n` +
+        `This may not reflect the current market price.\n\n` +
+        `Do you want to continue?`
+      );
 
-          // Priority 1: Use bestBid from market data (most reliable)
-          if (market.bestBid !== undefined) {
-            if (portfolioPosition.outcome === 'yes') {
-              currentPrice = parseFloat(market.bestBid);
-            } else {
-              // For NO positions, invert the YES bestAsk
-              currentPrice = market.bestAsk ? (1 - parseFloat(market.bestAsk)) : (1 - parseFloat(market.bestBid));
-            }
-            console.log(`✅ Closing ${portfolioPosition.outcome} position at market bestBid: $${currentPrice}`);
-            priceFound = true;
-          }
-
-          // Priority 2: Try orderbook if market bestBid not available
-          if (!priceFound && market.clobTokenIds) {
-            try {
-              const tokenIds = typeof market.clobTokenIds === 'string'
-                ? JSON.parse(market.clobTokenIds)
-                : market.clobTokenIds;
-
-              const tokenIndex = portfolioPosition.outcome === 'yes' ? 0 : 1;
-              const tokenId = tokenIds[tokenIndex];
-
-              if (tokenId) {
-                const obResponse = await fetch(`https://clob.polymarket.com/book?token_id=${tokenId}`);
-                if (obResponse.ok) {
-                  const orderbook = await obResponse.json();
-                  if (orderbook.bids && orderbook.bids.length > 0) {
-                    currentPrice = parseFloat(orderbook.bids[0].price);
-                    console.log(`✅ Closing ${portfolioPosition.outcome} position at orderbook bestBid: $${currentPrice}`);
-                    priceFound = true;
-                  }
-                }
-              }
-            } catch (obError) {
-              console.log(`⚠️ Orderbook not available, trying outcomePrices`);
-            }
-          }
-
-          // Priority 3: Fallback to outcomePrices
-          if (!priceFound) {
-            const outcomeIndex = portfolioPosition.outcome === 'yes' ? 0 : 1;
-            const prices = JSON.parse(market.outcomePrices);
-            currentPrice = parseFloat(prices[outcomeIndex]);
-            console.log(`✅ Closing position at outcomePrices: $${currentPrice}`);
-          }
-        } else {
-          console.warn('⚠️ Market not found, using entry price');
-        }
-      } catch (error) {
-        console.error('❌ Error fetching market price:', error);
+      if (!confirmClose) {
+        console.log('❌ User cancelled position close');
+        return;
       }
     }
 
