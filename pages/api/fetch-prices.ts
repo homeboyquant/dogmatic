@@ -31,14 +31,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const market = data[0];
           let priceFound = false;
 
-          // Priority 1: Try to get orderbook price (most accurate for active markets)
+          // Calculate expected price from market bestBid/bestAsk first
+          let expectedPrice = 0;
+          if (market.bestBid !== undefined && market.bestAsk !== undefined) {
+            if (position.outcome === 'yes') {
+              expectedPrice = parseFloat(market.bestBid);
+            } else {
+              expectedPrice = 1 - parseFloat(market.bestAsk);
+            }
+          }
+
+          // Priority 1: Try orderbook, but validate against market bestBid
           if (market.clobTokenIds && position.marketId) {
             try {
               const tokenIds = typeof market.clobTokenIds === 'string'
                 ? JSON.parse(market.clobTokenIds)
                 : market.clobTokenIds;
 
-              // Get token ID for the position's side
               const tokenIndex = position.outcome === 'yes' ? 0 : 1;
               const tokenId = tokenIds[tokenIndex];
 
@@ -46,11 +55,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const obResponse = await fetch(`https://clob.polymarket.com/book?token_id=${tokenId}`);
                 if (obResponse.ok) {
                   const orderbook = await obResponse.json();
-                  // Use best bid (what you can sell for)
                   if (orderbook.bids && orderbook.bids.length > 0) {
-                    priceMap[position.id] = parseFloat(orderbook.bids[0].price);
-                    console.log(`✅ ${position.marketQuestion} (${position.outcome}): orderbook bid=$${orderbook.bids[0].price}`);
-                    priceFound = true;
+                    const obPrice = parseFloat(orderbook.bids[0].price);
+
+                    // Compare orderbook price with expected market price
+                    if (expectedPrice > 0) {
+                      const priceDiff = Math.abs(obPrice - expectedPrice);
+                      const percentDiff = (priceDiff / expectedPrice) * 100;
+
+                      // If difference is > 10%, use market bestBid instead
+                      if (percentDiff > 10) {
+                        console.log(`⚠️ Orderbook price (${obPrice}) differs from market bestBid (${expectedPrice.toFixed(3)}) by ${percentDiff.toFixed(1)}% - using bestBid`);
+                        priceMap[position.id] = expectedPrice;
+                        priceFound = true;
+                      } else {
+                        priceMap[position.id] = obPrice;
+                        console.log(`✅ ${position.marketQuestion} (${position.outcome}): orderbook bid=${obPrice}`);
+                        priceFound = true;
+                      }
+                    } else {
+                      // No market price to compare, use orderbook
+                      priceMap[position.id] = obPrice;
+                      console.log(`✅ ${position.marketQuestion} (${position.outcome}): orderbook bid=${obPrice}`);
+                      priceFound = true;
+                    }
                   }
                 }
               }
@@ -59,11 +87,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
           }
 
-          // Priority 2: Use bestBid from market data if orderbook failed
-          if (!priceFound && market.bestBid !== undefined) {
-            const newPrice = parseFloat(market.bestBid);
-            priceMap[position.id] = newPrice;
-            console.log(`✅ ${position.marketQuestion}: bestBid=$${newPrice}`);
+          // Priority 2: Use bestBid/bestAsk from market data if orderbook failed
+          if (!priceFound && expectedPrice > 0) {
+            priceMap[position.id] = expectedPrice;
+            console.log(`✅ ${position.marketQuestion} (${position.outcome}): market sell price=${expectedPrice.toFixed(3)}`);
             priceFound = true;
           }
 
