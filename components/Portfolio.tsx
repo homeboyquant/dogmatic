@@ -312,45 +312,45 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis,
                   <div className={`${styles.pnlValue} ${pnl >= 0 ? styles.positive : styles.negative}`}>
                     {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} ({pnl >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
                   </div>
-                  {!position.closed && (
-                    <div className={styles.positionActions}>
-                      {position.polymarketUrl ? (
-                        <a
-                          href={position.polymarketUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={styles.viewOnPolymarketButton}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                            <polyline points="15 3 21 3 21 9"></polyline>
-                            <line x1="10" y1="14" x2="21" y2="3"></line>
-                          </svg>
-                          View on Polymarket
-                        </a>
-                      ) : (
-                        <button
-                          className={styles.addPolymarketLinkButton}
-                          onClick={() => {
-                            setEditingUrlId(position.id);
-                            setEditUrlValue('');
-                          }}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                          </svg>
-                          Add Polymarket Link
-                        </button>
-                      )}
+                  <div className={styles.positionActions}>
+                    {position.polymarketUrl ? (
+                      <a
+                        href={position.polymarketUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.viewOnPolymarketButton}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                          <polyline points="15 3 21 3 21 9"></polyline>
+                          <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        View on Polymarket
+                      </a>
+                    ) : !position.closed && (
+                      <button
+                        className={styles.addPolymarketLinkButton}
+                        onClick={() => {
+                          setEditingUrlId(position.id);
+                          setEditUrlValue('');
+                        }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        Add Polymarket Link
+                      </button>
+                    )}
+                    {!position.closed && (
                       <button
                         className={styles.closeButton}
                         onClick={() => onClose(position)}
                       >
                         Close Position
                       </button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
 
                 {editingUrlId === position.id && (
