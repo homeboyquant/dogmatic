@@ -149,13 +149,15 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
           });
           await portfolioService.savePortfolio(userId, portfolio);
           console.log('✅ Portfolio saved successfully to Firestore');
-        } catch (error) {
+        } catch (error: any) {
           console.error('❌ Error saving portfolio:', error);
           console.error('Portfolio data that failed to save:', {
             userId,
             positionsCount: portfolio.positions.length,
             balance: portfolio.balance,
           });
+          // Show visible error to user
+          alert(`⚠️ PORTFOLIO SAVE FAILED!\n\nError: ${error.message}\n\nYour trades may not persist after logout. Check console for details.`);
         }
       };
       savePortfolio();

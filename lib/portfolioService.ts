@@ -47,15 +47,37 @@ export class PortfolioService {
     try {
       const docRef = doc(db, COLLECTION, userId);
 
-      const portfolioData = {
+      // Clean undefined values from portfolio data (Firestore doesn't accept undefined)
+      const cleanPortfolioData = JSON.parse(JSON.stringify({
         ...portfolio,
         updatedAt: Date.now(),
-      };
+        // Clean positions array
+        positions: portfolio.positions.map(p => {
+          const cleanPos: any = {};
+          Object.keys(p).forEach(key => {
+            if ((p as any)[key] !== undefined) {
+              cleanPos[key] = (p as any)[key];
+            }
+          });
+          return cleanPos;
+        }),
+        // Clean trades array
+        trades: portfolio.trades.map(t => {
+          const cleanTrade: any = {};
+          Object.keys(t).forEach(key => {
+            if ((t as any)[key] !== undefined) {
+              cleanTrade[key] = (t as any)[key];
+            }
+          });
+          return cleanTrade;
+        }),
+      }));
 
-      await setDoc(docRef, portfolioData);
+      await setDoc(docRef, cleanPortfolioData);
       console.log('✅ Portfolio saved to Firestore');
     } catch (error) {
       console.error('❌ Error saving portfolio to Firestore:', error);
+      throw error; // Re-throw so the error handler can show alert
     }
   }
 
