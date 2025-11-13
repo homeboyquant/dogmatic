@@ -522,7 +522,7 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
       return;
     }
 
-    // Fetch current market price from API
+    // Fetch current market price from API using bestBid (sell price)
     let currentPrice = position.avgPrice; // Fallback to entry price
 
     if (portfolioPosition.marketSlug) {
@@ -532,10 +532,53 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
 
         if (data.length > 0) {
           const market = data[0];
-          const outcomeIndex = portfolioPosition.outcome === 'yes' ? 0 : 1;
-          const prices = JSON.parse(market.outcomePrices);
-          currentPrice = parseFloat(prices[outcomeIndex]);
-          console.log(`✅ Closing position at current price: $${currentPrice}`);
+          let priceFound = false;
+
+          // Priority 1: Try to get orderbook bestBid (most accurate sell price)
+          if (market.clobTokenIds) {
+            try {
+              const tokenIds = typeof market.clobTokenIds === 'string'
+                ? JSON.parse(market.clobTokenIds)
+                : market.clobTokenIds;
+
+              const tokenIndex = portfolioPosition.outcome === 'yes' ? 0 : 1;
+              const tokenId = tokenIds[tokenIndex];
+
+              if (tokenId) {
+                const obResponse = await fetch(`https://clob.polymarket.com/book?token_id=${tokenId}`);
+                if (obResponse.ok) {
+                  const orderbook = await obResponse.json();
+                  if (orderbook.bids && orderbook.bids.length > 0) {
+                    currentPrice = parseFloat(orderbook.bids[0].price);
+                    console.log(`✅ Closing ${portfolioPosition.outcome} position at orderbook bestBid: $${currentPrice}`);
+                    priceFound = true;
+                  }
+                }
+              }
+            } catch (obError) {
+              console.log(`⚠️ Orderbook not available, trying bestBid`);
+            }
+          }
+
+          // Priority 2: Use bestBid from market data
+          if (!priceFound && market.bestBid !== undefined) {
+            if (portfolioPosition.outcome === 'yes') {
+              currentPrice = parseFloat(market.bestBid);
+            } else {
+              // For NO positions, invert the YES bestAsk
+              currentPrice = market.bestAsk ? (1 - parseFloat(market.bestAsk)) : parseFloat(market.bestBid);
+            }
+            console.log(`✅ Closing ${portfolioPosition.outcome} position at bestBid: $${currentPrice}`);
+            priceFound = true;
+          }
+
+          // Priority 3: Fallback to outcomePrices
+          if (!priceFound) {
+            const outcomeIndex = portfolioPosition.outcome === 'yes' ? 0 : 1;
+            const prices = JSON.parse(market.outcomePrices);
+            currentPrice = parseFloat(prices[outcomeIndex]);
+            console.log(`✅ Closing position at outcomePrices: $${currentPrice}`);
+          }
         } else {
           console.warn('⚠️ Market not found, using entry price');
         }

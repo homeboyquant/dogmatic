@@ -122,7 +122,7 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis,
   const closedPositions = positions.filter(pos => pos.closed);
   const displayPositions = showClosed ? closedPositions : openPositions;
 
-  const totalPnL = openPositions.reduce((sum, pos) => {
+  const totalPnL = positions.reduce((sum, pos) => {
     const { pnl } = calculatePnL(pos);
     return sum + pnl;
   }, 0);

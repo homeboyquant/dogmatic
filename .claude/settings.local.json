@@ -28,7 +28,9 @@
       "Bash(git remote add:*)",
       "Bash(git add:*)",
       "Bash(npx tsc:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
