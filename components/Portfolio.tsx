@@ -131,6 +131,11 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis,
     return sum + pnl;
   }, 0);
 
+  const realizedPnL = closedPositions.reduce((sum, pos) => {
+    const { pnl } = calculatePnL(pos);
+    return sum + pnl;
+  }, 0);
+
   const totalValue = openPositions.reduce((sum, pos) => {
     const { currentPrice } = calculatePnL(pos);
     return sum + (currentPrice * pos.shares);
@@ -179,6 +184,12 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis,
           <div className={styles.summaryLabel}>Total P&L</div>
           <div className={`${styles.summaryValue} ${totalPnL >= 0 ? styles.positive : styles.negative}`}>
             {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(2)}
+          </div>
+        </div>
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryLabel}>Realized P&L</div>
+          <div className={`${styles.summaryValue} ${realizedPnL >= 0 ? styles.positive : styles.negative}`}>
+            {realizedPnL >= 0 ? '+' : ''}${realizedPnL.toFixed(2)}
           </div>
         </div>
         <div className={styles.summaryCard}>

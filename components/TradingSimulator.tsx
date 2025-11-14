@@ -703,7 +703,7 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
           })()}</div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statLabel}>P&L</div>
+          <div className={styles.statLabel}>Total P&L</div>
           <div className={`${styles.statValue} ${(() => {
             const totalPnL = portfolio.positions.reduce((sum, pos) => {
                 // For closed positions, use exitPrice. For open positions, use current price
@@ -723,6 +723,28 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
                 return sum + ((currentPrice - pos.avgPrice) * pos.shares);
               }, 0);
               return `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toFixed(2)}`;
+            })()}
+          </div>
+        </div>
+        <div className={styles.statCard}>
+          <div className={styles.statLabel}>Realized P&L</div>
+          <div className={`${styles.statValue} ${(() => {
+            const realizedPnL = portfolio.positions
+              .filter(pos => pos.closed)
+              .reduce((sum, pos) => {
+                const exitPrice = pos.exitPrice || pos.avgPrice;
+                return sum + ((exitPrice - pos.avgPrice) * pos.shares);
+              }, 0);
+            return realizedPnL >= 0 ? styles.positive : styles.negative;
+          })()}`}>
+            {(() => {
+              const realizedPnL = portfolio.positions
+                .filter(pos => pos.closed)
+                .reduce((sum, pos) => {
+                  const exitPrice = pos.exitPrice || pos.avgPrice;
+                  return sum + ((exitPrice - pos.avgPrice) * pos.shares);
+                }, 0);
+              return `${realizedPnL >= 0 ? '+' : ''}$${realizedPnL.toFixed(2)}`;
             })()}
           </div>
         </div>
