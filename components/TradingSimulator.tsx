@@ -660,10 +660,34 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
     return <Portfolio positions={convertedPositions} balance={portfolio.balance} onClose={handleClosePosition} onUpdateThesis={handleUpdateThesis} onUpdatePolymarketUrl={handleUpdatePolymarketUrl} onUpdateExitNotes={handleUpdateExitNotes} />;
   }
 
+  // Calculate P&L values that update with currentPrices
+  const totalPnL = portfolio.positions.reduce((sum, pos) => {
+    const currentPrice = pos.closed && pos.exitPrice
+      ? pos.exitPrice
+      : (currentPrices[pos.id] || pos.avgPrice);
+    return sum + ((currentPrice - pos.avgPrice) * pos.shares);
+  }, 0);
+
+  const realizedPnL = portfolio.positions
+    .filter(pos => pos.closed)
+    .reduce((sum, pos) => {
+      const exitPrice = pos.exitPrice || pos.avgPrice;
+      return sum + ((exitPrice - pos.avgPrice) * pos.shares);
+    }, 0);
+
+  const openPositionsValue = portfolio.positions
+    .filter(pos => !pos.closed)
+    .reduce((sum, pos) => {
+      const currentPrice = currentPrices[pos.id] || pos.avgPrice;
+      return sum + (currentPrice * pos.shares);
+    }, 0);
+
+  const totalValue = portfolio.balance + openPositionsValue;
+
   return (
     <div className={styles.container}>
       {/* Trading Timer */}
-      <TradingTimer />
+      <TradingTimer currentPnL={realizedPnL} />
 
       {/* Search bar always visible at top */}
       <div className={styles.searchSection}>
@@ -698,60 +722,18 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
         </div>
         <div className={styles.statCard}>
           <div className={styles.statLabel}>Total Value</div>
-          <div className={styles.statValue}>${(() => {
-            const positionsValue = portfolio.positions
-              .filter(pos => !pos.closed) // Only count open positions
-              .reduce((sum, pos) => {
-                const currentPrice = currentPrices[pos.id] || pos.avgPrice;
-                return sum + (currentPrice * pos.shares);
-              }, 0);
-            return (portfolio.balance + positionsValue).toFixed(2);
-          })()}</div>
+          <div className={styles.statValue}>${totalValue.toFixed(2)}</div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statLabel}>Total P&L</div>
-          <div className={`${styles.statValue} ${(() => {
-            const totalPnL = portfolio.positions.reduce((sum, pos) => {
-                // For closed positions, use exitPrice. For open positions, use current price
-                const currentPrice = pos.closed && pos.exitPrice
-                  ? pos.exitPrice
-                  : (currentPrices[pos.id] || pos.avgPrice);
-                return sum + ((currentPrice - pos.avgPrice) * pos.shares);
-              }, 0);
-            return totalPnL >= 0 ? styles.positive : styles.negative;
-          })()}`}>
-            {(() => {
-              const totalPnL = portfolio.positions.reduce((sum, pos) => {
-                // For closed positions, use exitPrice. For open positions, use current price
-                const currentPrice = pos.closed && pos.exitPrice
-                  ? pos.exitPrice
-                  : (currentPrices[pos.id] || pos.avgPrice);
-                return sum + ((currentPrice - pos.avgPrice) * pos.shares);
-              }, 0);
-              return `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toFixed(2)}`;
-            })()}
+          <div className={`${styles.statValue} ${totalPnL >= 0 ? styles.positive : styles.negative}`}>
+            {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(2)}
           </div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statLabel}>Realized P&L</div>
-          <div className={`${styles.statValue} ${(() => {
-            const realizedPnL = portfolio.positions
-              .filter(pos => pos.closed)
-              .reduce((sum, pos) => {
-                const exitPrice = pos.exitPrice || pos.avgPrice;
-                return sum + ((exitPrice - pos.avgPrice) * pos.shares);
-              }, 0);
-            return realizedPnL >= 0 ? styles.positive : styles.negative;
-          })()}`}>
-            {(() => {
-              const realizedPnL = portfolio.positions
-                .filter(pos => pos.closed)
-                .reduce((sum, pos) => {
-                  const exitPrice = pos.exitPrice || pos.avgPrice;
-                  return sum + ((exitPrice - pos.avgPrice) * pos.shares);
-                }, 0);
-              return `${realizedPnL >= 0 ? '+' : ''}$${realizedPnL.toFixed(2)}`;
-            })()}
+          <div className={`${styles.statValue} ${realizedPnL >= 0 ? styles.positive : styles.negative}`}>
+            {realizedPnL >= 0 ? '+' : ''}${realizedPnL.toFixed(2)}
           </div>
         </div>
         <button className={styles.resetButton} onClick={handleResetBalance}>

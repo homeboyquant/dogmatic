@@ -1,35 +1,29 @@
 .container {
-  background: rgba(139, 92, 246, 0.08);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: 12px;
   padding: 12px 16px;
   margin-bottom: 20px;
-  max-width: 500px;
+  width: 100%;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: none;
 }
 
 .container:hover {
-  border-color: rgba(139, 92, 246, 0.5);
-  box-shadow: 0 8px 12px rgba(139, 92, 246, 0.15);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .expanded {
-  background: rgba(139, 92, 246, 0.12);
+  background: transparent;
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   cursor: pointer;
   user-select: none;
-}
-
-.headerLeft {
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .headerRight {
@@ -38,15 +32,290 @@
   gap: 12px;
 }
 
-.clockIcon {
+.pnlDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: transparent;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  transition: all 0.3s ease;
+  box-shadow: none;
+}
+
+.pnlDisplay.goalAchieved {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.pnlDisplayIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border-radius: 8px;
   color: #8b5cf6;
+  transition: all 0.3s ease;
+}
+
+.goalAchieved .pnlDisplayIcon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  animation: pulse-icon 2s ease-in-out infinite;
+}
+
+@keyframes pulse-icon {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.pnlDisplayInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 90px;
+}
+
+.pnlDisplayAmount {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.pnlDisplaySubtext {
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.goalReached {
+  color: #10b981;
+  animation: celebration 0.6s ease-in-out;
+}
+
+@keyframes celebration {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.remaining {
+  color: var(--text-secondary);
+}
+
+.goalDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(251, 191, 36, 0.08);
+  border-radius: 10px;
+  border: 1.5px solid rgba(251, 191, 36, 0.2);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(251, 191, 36, 0.05);
+}
+
+.goalDisplayIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 8px;
+  color: #f59e0b;
+  transition: all 0.3s ease;
+}
+
+.goalDisplayInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 60px;
+}
+
+.goalDisplayAmount {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.goalDisplaySubtext {
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  color: #f59e0b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.progressDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(99, 102, 241, 0.08);
+  border-radius: 10px;
+  border: 1.5px solid rgba(99, 102, 241, 0.2);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.05);
+}
+
+.progressDisplay.goalAchieved {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+  border-color: rgba(16, 185, 129, 0.3);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+}
+
+.progressDisplayIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 8px;
+  color: #6366f1;
+  transition: all 0.3s ease;
+}
+
+.progressDisplay.goalAchieved .progressDisplayIcon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  animation: pulse-icon 2s ease-in-out infinite;
+}
+
+.progressDisplayInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 60px;
+}
+
+.progressDisplayAmount {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.progressDisplayAmount .goalReached {
+  color: #10b981;
+}
+
+.progressDisplaySubtext {
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  color: #6366f1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.progressDisplaySubtext .goalReached {
+  color: #10b981;
+}
+
+.timerTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(139, 92, 246, 0.9);
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Hide title on mobile */
+@media (max-width: 768px) {
+  .timerTitle {
+    display: none;
+  }
+}
+
+.timerDivider {
+  width: 2px;
+  height: 32px;
+  background: linear-gradient(180deg, transparent 0%, rgba(139, 92, 246, 0.3) 50%, transparent 100%);
+  margin: 0 10px;
+}
+
+.timeDisplay {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: transparent;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.timeDisplay.warning {
+  background: transparent;
+  border-color: transparent;
+  animation: pulse-warning 1s ease-in-out infinite;
+}
+
+.timeIcon {
+  color: #10b981;
   flex-shrink: 0;
 }
 
-.title {
+.timeDisplay.warning .timeIcon {
+  color: #f59e0b;
+}
+
+.timeValue {
   font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #10b981;
+  min-width: 100px;
+  text-align: left;
+}
+
+.timeDisplay.warning .timeValue {
+  color: #f59e0b;
+}
+
+.durationBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+
+.durationIcon {
+  color: #8b5cf6;
+  opacity: 0.7;
+}
+
+.durationText {
+  font-size: 12px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 .display {
@@ -150,6 +419,12 @@
   gap: 8px;
 }
 
+.pnlGoalControl {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .label {
   font-size: 11px;
   font-weight: 500;
@@ -172,6 +447,12 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
+}
+
+.durationValue.notSet {
+  color: var(--text-secondary);
+  font-style: italic;
+  opacity: 0.7;
 }
 
 .editButton {
@@ -231,6 +512,13 @@
   font-size: 12px;
   color: var(--text-secondary);
   font-weight: 500;
+}
+
+.dollarSign {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  padding-left: 4px;
 }
 
 .durationSaveButton,
@@ -340,14 +628,16 @@
 }
 
 .pauseButton {
-  background: #f59e0b;
+  background: #6b7280;
   color: white;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
 }
 
 .pauseButton:hover {
+  background: #4b5563;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 6px 16px rgba(107, 114, 128, 0.4);
 }
 
 .resetButton {
@@ -360,6 +650,62 @@
   background: rgba(239, 68, 68, 0.2);
   border-color: rgba(239, 68, 68, 0.5);
   transform: translateY(-2px);
+}
+
+.pnlGoalProgress {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(139, 92, 246, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(139, 92, 246, 0.15);
+}
+
+.pnlGoalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.pnlGoalLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pnlGoalValue {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.pnlPercentage {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.timeProgressSection {
+  margin-bottom: 12px;
+}
+
+.progressFill.success {
+  background: #10b981;
+  animation: pulse-success 2s ease-in-out infinite;
+}
+
+@keyframes pulse-success {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }
 
 .completedMessage {

@@ -145,7 +145,7 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis,
   return (
     <div className={styles.container}>
       {/* Trading Timer */}
-      <TradingTimer />
+      <TradingTimer currentPnL={realizedPnL} />
 
       <div className={styles.header}>
         <h1 className={styles.title}>Portfolio</h1>
