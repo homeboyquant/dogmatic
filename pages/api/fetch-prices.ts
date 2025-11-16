@@ -23,9 +23,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       try {
-        // Fetch market data directly using market slug
-        const response = await fetch(`https://gamma-api.polymarket.com/markets?slug=${position.marketSlug}`);
-        const data = await response.json();
+        // Try fetching by market slug first
+        let data = [];
+        let response = await fetch(`https://gamma-api.polymarket.com/markets?slug=${position.marketSlug}`);
+        data = await response.json();
+
+        // If slug doesn't work and we have a marketId, try fetching by ID
+        if ((!data || data.length === 0) && position.marketId) {
+          console.log(`⚠️ Slug lookup failed for ${position.marketSlug}, trying marketId: ${position.marketId}`);
+          response = await fetch(`https://gamma-api.polymarket.com/markets?id=${position.marketId}`);
+          data = await response.json();
+        }
 
         if (data.length > 0) {
           const market = data[0];

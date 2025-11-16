@@ -171,9 +171,11 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
     const fetchPrices = async () => {
       const convertedPositions = portfolio.positions.map(pos => ({
         id: pos.id,
+        marketId: pos.marketId,
         outcome: pos.side.toLowerCase() as 'yes' | 'no',
         entryPrice: pos.avgPrice,
         marketSlug: pos.marketSlug || '',
+        marketQuestion: pos.marketQuestion,
       }));
 
       try {

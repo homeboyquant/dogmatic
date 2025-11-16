@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://dogmatic.vercel.app
+Host: https://polydogs.vercel.app
 
 # Sitemaps
-Sitemap: https://dogmatic.vercel.app/sitemap.xml
+Sitemap: https://polydogs.vercel.app/sitemap.xml
