@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './TradingSimulator.module.css';
 import Portfolio from './Portfolio';
+import TradingTimer from './TradingTimer';
 import type { Position, Trade, Portfolio as PortfolioType } from '@/types/trading';
 import { portfolioService } from '@/lib/portfolioService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -661,6 +662,9 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
 
   return (
     <div className={styles.container}>
+      {/* Trading Timer */}
+      <TradingTimer />
+
       {/* Search bar always visible at top */}
       <div className={styles.searchSection}>
         <form className={styles.searchForm} onSubmit={handleSearch}>

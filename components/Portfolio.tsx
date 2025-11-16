@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Position } from '@/types/trading';
+import TradingTimer from './TradingTimer';
 import styles from './Portfolio.module.css';
 
 interface PortfolioPosition {
@@ -143,6 +144,9 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis,
 
   return (
     <div className={styles.container}>
+      {/* Trading Timer */}
+      <TradingTimer />
+
       <div className={styles.header}>
         <h1 className={styles.title}>Portfolio</h1>
         <div className={styles.headerActions}>
