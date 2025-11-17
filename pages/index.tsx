@@ -61,7 +61,7 @@ export default function Home() {
           <TradingSimulator currentView={currentView} />
         </div>
         <footer className={styles.footer}>
-          © 2025 Polydogs • Paper Trading Journal
+          <iframe src={`https://ticker.polymarket.com/embed?category=Breaking News&theme=${theme}&speed=1&displayMode=classic`} width="100%" height="60" frameBorder="0" scrolling="no" style={{ border: 'none', overflow: 'hidden', display: 'block', margin: 0, padding: 0, verticalAlign: 'bottom' }}></iframe>
         </footer>
       </main>
     </>
