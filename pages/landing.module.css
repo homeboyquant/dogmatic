@@ -112,22 +112,37 @@
 
 .footer {
   padding: 0;
-  margin: 0;
-  border: none;
+  margin: 20px;
+  border: 4px solid #000;
   background: var(--bg-secondary);
+  box-shadow: 8px 8px 0px #000;
   overflow: hidden;
   line-height: 0;
   font-size: 0;
   font-family: 'Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  height: 60px;
-  border-radius: 4px;
+  position: relative;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-.footer iframe {
+[data-theme="dark"] .footer {
+  border-color: #4C9AFF;
+  box-shadow: 8px 8px 0px #4C9AFF;
+}
+
+[data-theme="dark"] .footer:hover {
+  box-shadow: 6px 6px 0px #4C9AFF;
+}
+
+.footer:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 6px 6px 0px #000;
+}
+
+/* .footer iframe {
   display: block;
   vertical-align: bottom;
   border-radius: 4px;
-}
+} */
 
 @media (max-width: 968px) {
   .header {
@@ -152,7 +167,7 @@
   }
 
   .footer {
-    padding: 0;
-    margin: 0;
+    margin: 12px;
+    box-shadow: 6px 6px 0px #000;
   }
 }
