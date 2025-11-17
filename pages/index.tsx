@@ -26,7 +26,10 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         <div className={styles.header}>
-          <div className={styles.logo}>Polydogs</div>
+          <div className={styles.logo}>
+            <img src="/pitbull.png" alt="Pitbull" className={styles.logoIcon} />
+            <span>Polydogs</span>
+          </div>
           <div className={styles.nav}>
             <button
               className={`${styles.navButton} ${currentView === 'trading' ? styles.active : ''}`}

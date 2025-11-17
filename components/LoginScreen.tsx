@@ -21,7 +21,7 @@ export default function LoginScreen() {
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.logo}>
-          <img src="/dogs2.png" alt="Dogmatic" className={styles.logoImage} />
+          <img src="/pitbull.png" alt="Polydogs" className={styles.logoImage} />
         </div>
 
         <h1 className={styles.title}>Polydogs</h1>
