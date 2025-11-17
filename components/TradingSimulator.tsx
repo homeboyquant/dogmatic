@@ -691,10 +691,10 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
   }));
 
   if (currentView === 'portfolio') {
-    return <Portfolio positions={convertedPositions} balance={portfolio.balance} onClose={handleClosePosition} onUpdateThesis={handleUpdateThesis} onUpdatePolymarketUrl={handleUpdatePolymarketUrl} onUpdateExitNotes={handleUpdateExitNotes} />;
+    return <Portfolio positions={convertedPositions} balance={portfolio.balance} initialBalance={portfolio.initialBalance} onClose={handleClosePosition} onUpdateThesis={handleUpdateThesis} onUpdatePolymarketUrl={handleUpdatePolymarketUrl} onUpdateExitNotes={handleUpdateExitNotes} />;
   }
 
-  // Calculate P&L values that update with currentPrices
+  // Total P&L from all positions (sum of individual P&Ls)
   const totalPnL = portfolio.positions.reduce((sum, pos) => {
     const currentPrice = pos.closed && pos.exitPrice
       ? pos.exitPrice
@@ -702,6 +702,7 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
     return sum + ((currentPrice - pos.avgPrice) * pos.shares);
   }, 0);
 
+  // Realized P&L = P&L from closed positions only
   const realizedPnL = portfolio.positions
     .filter(pos => pos.closed)
     .reduce((sum, pos) => {
@@ -709,6 +710,7 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
       return sum + ((exitPrice - pos.avgPrice) * pos.shares);
     }, 0);
 
+  // Calculate open positions value (current market value)
   const openPositionsValue = portfolio.positions
     .filter(pos => !pos.closed)
     .reduce((sum, pos) => {
@@ -716,7 +718,30 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
       return sum + (currentPrice * pos.shares);
     }, 0);
 
-  const totalValue = portfolio.balance + openPositionsValue;
+  // Calculate cost basis of open positions (original amount paid)
+  const openPositionsCostBasis = portfolio.positions
+    .filter(pos => !pos.closed)
+    .reduce((sum, pos) => {
+      return sum + (pos.avgPrice * pos.shares);
+    }, 0);
+
+  // Total Portfolio Value = Initial Balance + Total P&L
+  const totalPortfolioValue = portfolio.initialBalance + totalPnL;
+
+  // Cash Balance = Total Portfolio - Cost Basis of Open Positions
+  const cashBalance = totalPortfolioValue - openPositionsCostBasis;
+
+  // Debug logging
+  console.log('📊 TradingSimulator Debug:', {
+    initialBalance: portfolio.initialBalance,
+    actualBalance: portfolio.balance,
+    calculatedCashBalance: cashBalance,
+    openPositionsValue,
+    openPositionsCostBasis,
+    totalPortfolioValue,
+    totalPnL,
+    realizedPnL,
+  });
 
   // If only rendering timer in header
   if (renderTimerOnly) {
@@ -757,11 +782,11 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
       <div className={styles.statsBar}>
         <div className={styles.statCard}>
           <div className={styles.statLabel}>Cash Balance</div>
-          <div className={styles.statValue}>${portfolio.balance.toFixed(2)}</div>
+          <div className={styles.statValue}>${cashBalance.toFixed(2)}</div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statLabel}>Total Value</div>
-          <div className={styles.statValue}>${totalValue.toFixed(2)}</div>
+          <div className={styles.statLabel}>Total Portfolio</div>
+          <div className={styles.statValue}>${totalPortfolioValue.toFixed(2)}</div>
         </div>
         <div className={styles.statCard}>
           <div className={styles.statLabel}>Total P&L</div>

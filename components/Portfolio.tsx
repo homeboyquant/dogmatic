@@ -21,13 +21,14 @@ interface PortfolioPosition {
 interface PortfolioProps {
   positions: PortfolioPosition[];
   balance: number;
+  initialBalance: number;
   onClose: (position: PortfolioPosition) => void;
   onUpdateThesis: (positionId: string, thesis: string) => void;
   onUpdatePolymarketUrl: (positionId: string, url: string) => void;
   onUpdateExitNotes: (positionId: string, notes: string) => void;
 }
 
-export default function Portfolio({ positions, balance, onClose, onUpdateThesis, onUpdatePolymarketUrl, onUpdateExitNotes }: PortfolioProps) {
+export default function Portfolio({ positions, balance, initialBalance, onClose, onUpdateThesis, onUpdatePolymarketUrl, onUpdateExitNotes }: PortfolioProps) {
   const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({});
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [editingThesisId, setEditingThesisId] = useState<string | null>(null);
@@ -127,20 +128,48 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis,
   const closedPositions = positions.filter(pos => pos.closed);
   const displayPositions = showClosed ? closedPositions : openPositions;
 
+  // Total P&L from all positions (sum of individual P&Ls)
   const totalPnL = positions.reduce((sum, pos) => {
     const { pnl } = calculatePnL(pos);
     return sum + pnl;
   }, 0);
 
+  // Realized P&L = P&L from closed positions only
   const realizedPnL = closedPositions.reduce((sum, pos) => {
     const { pnl } = calculatePnL(pos);
     return sum + pnl;
   }, 0);
 
-  const totalValue = openPositions.reduce((sum, pos) => {
+  // Calculate open positions value (current market value)
+  const openPositionsValue = openPositions.reduce((sum, pos) => {
     const { currentPrice } = calculatePnL(pos);
     return sum + (currentPrice * pos.shares);
   }, 0);
+
+  // Calculate cost basis of open positions (original amount paid)
+  const openPositionsCostBasis = openPositions.reduce((sum, pos) => {
+    return sum + (pos.entryPrice * pos.shares);
+  }, 0);
+
+  // Total Portfolio Value = Initial Balance + Total P&L
+  const totalPortfolioValue = initialBalance + totalPnL;
+
+  // Cash Balance = Total Portfolio - Cost Basis of Open Positions
+  const cashBalance = totalPortfolioValue - openPositionsCostBasis;
+
+  // Debug logging
+  console.log('📊 Portfolio Debug:', {
+    initialBalance,
+    actualBalance: balance,
+    calculatedCashBalance: cashBalance,
+    openPositionsValue,
+    openPositionsCostBasis,
+    totalPortfolioValue,
+    totalPnL,
+    realizedPnL,
+    openPositionsCount: openPositions.length,
+    closedPositionsCount: closedPositions.length,
+  });
 
   return (
     <div className={styles.container}>
@@ -177,12 +206,16 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis,
 
       <div className={styles.summary}>
         <div className={styles.summaryCard}>
-          <div className={styles.summaryLabel}>Cash Balance</div>
-          <div className={styles.summaryValue}>${balance.toFixed(2)}</div>
+          <div className={styles.summaryLabel}>Total Portfolio</div>
+          <div className={styles.summaryValue}>${totalPortfolioValue.toFixed(2)}</div>
         </div>
         <div className={styles.summaryCard}>
-          <div className={styles.summaryLabel}>Positions Value</div>
-          <div className={styles.summaryValue}>${totalValue.toFixed(2)}</div>
+          <div className={styles.summaryLabel}>Cash Balance</div>
+          <div className={styles.summaryValue}>${cashBalance.toFixed(2)}</div>
+        </div>
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryLabel}>Open Positions Value</div>
+          <div className={styles.summaryValue}>${openPositionsValue.toFixed(2)}</div>
         </div>
         <div className={styles.summaryCard}>
           <div className={styles.summaryLabel}>Total P&L</div>
@@ -195,10 +228,6 @@ export default function Portfolio({ positions, balance, onClose, onUpdateThesis,
           <div className={`${styles.summaryValue} ${realizedPnL >= 0 ? styles.positive : styles.negative}`}>
             {realizedPnL >= 0 ? '+' : ''}${realizedPnL.toFixed(2)}
           </div>
-        </div>
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryLabel}>Total Portfolio</div>
-          <div className={styles.summaryValue}>${(balance + totalValue).toFixed(2)}</div>
         </div>
       </div>
 
