@@ -4,9 +4,10 @@ import styles from './TradingTimer.module.css';
 
 interface TradingTimerProps {
   currentPnL?: number;
+  isInHeader?: boolean;
 }
 
-export default function TradingTimer({ currentPnL = 0 }: TradingTimerProps) {
+export default function TradingTimer({ currentPnL = 0, isInHeader = false }: TradingTimerProps) {
   const {
     duration,
     isActive,
@@ -64,12 +65,12 @@ export default function TradingTimer({ currentPnL = 0 }: TradingTimerProps) {
   const isAlmostExpired = isActive && timeRemaining > 0 && timeRemaining < 5 * 60 * 1000; // Last 5 minutes
 
   return (
-    <div className={`${styles.container} ${isExpanded ? styles.expanded : ''}`}>
+    <div className={`${styles.container} ${isExpanded ? styles.expanded : ''} ${isInHeader ? styles.inHeader : ''}`}>
       <div className={styles.header} onClick={() => setIsExpanded(!isExpanded)}>
         <div className={styles.headerRight}>
           <div className={styles.pnlDisplay}>
             <div className={styles.pnlDisplayIcon}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="1" x2="12" y2="23"></line>
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
               </svg>

@@ -39,11 +39,12 @@ interface Event {
 
 interface TradingSimulatorProps {
   currentView: 'trading' | 'portfolio';
+  renderTimerOnly?: boolean;
 }
 
 const INITIAL_BALANCE = 500;
 
-export default function TradingSimulator({ currentView }: TradingSimulatorProps) {
+export default function TradingSimulator({ currentView, renderTimerOnly = false }: TradingSimulatorProps) {
   const { userId } = useAuth();
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
@@ -683,6 +684,11 @@ export default function TradingSimulator({ currentView }: TradingSimulatorProps)
     }, 0);
 
   const totalValue = portfolio.balance + openPositionsValue;
+
+  // If only rendering timer in header
+  if (renderTimerOnly) {
+    return <TradingTimer currentPnL={realizedPnL} isInHeader={true} />;
+  }
 
   return (
     <div className={styles.container}>

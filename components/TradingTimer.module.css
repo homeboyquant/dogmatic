@@ -9,6 +9,13 @@
   box-shadow: none;
 }
 
+@media (min-width: 769px) {
+  .container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
 .container:hover {
   border-color: transparent;
   box-shadow: none;
@@ -18,9 +25,37 @@
   background: transparent;
 }
 
+.inHeader {
+  padding: 0;
+  margin: 0;
+  width: auto;
+}
+
+.inHeader .pnlDisplayIcon {
+  width: 28px;
+  height: 28px;
+}
+
+.inHeader .pnlDisplay {
+  padding: 8px 12px;
+}
+
+.inHeader .timeDisplay,
+.inHeader .durationBadge {
+  padding: 8px 12px;
+}
+
+.inHeader .pnlDisplayAmount {
+  font-size: 14px;
+}
+
+.inHeader .timerDivider {
+  height: 24px;
+}
+
 .header {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   cursor: pointer;
   user-select: none;
@@ -36,7 +71,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.04) 0%, rgba(99, 102, 241, 0.06) 100%);
   border-radius: 12px;
   border: 1px solid rgba(139, 92, 246, 0.12);
@@ -60,10 +95,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.12) 100%);
-  border-radius: 10px;
+  border-radius: 8px;
   color: #8b5cf6;
   transition: all 0.3s ease;
   box-shadow: 0 1px 2px rgba(139, 92, 246, 0.1);
@@ -270,7 +305,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(5, 150, 105, 0.06) 100%);
   border-radius: 12px;
   border: 1px solid rgba(16, 185, 129, 0.12);
@@ -316,7 +351,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.04) 0%, rgba(99, 102, 241, 0.06) 100%);
   border-radius: 12px;
   border: 1px solid rgba(139, 92, 246, 0.12);
@@ -755,11 +790,11 @@
 
 /* Dark theme adjustments */
 [data-theme="dark"] .container {
-  background: rgba(139, 92, 246, 0.12);
+  /* background: rgba(139, 92, 246, 0.12); */
 }
 
 [data-theme="dark"] .container:hover {
-  box-shadow: 0 8px 12px rgba(139, 92, 246, 0.25);
+  /* box-shadow: 0 8px 12px rgba(139, 92, 246, 0.25); */
 }
 
 [data-theme="dark"] .durationInput {
