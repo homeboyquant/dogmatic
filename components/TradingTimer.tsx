@@ -68,44 +68,24 @@ export default function TradingTimer({ currentPnL = 0, isInHeader = false }: Tra
     <div className={`${styles.container} ${isExpanded ? styles.expanded : ''} ${isInHeader ? styles.inHeader : ''}`}>
       <div className={styles.header} onClick={() => setIsExpanded(!isExpanded)}>
         <div className={styles.headerRight}>
-          <div className={styles.pnlDisplay}>
-            <div className={styles.pnlDisplayIcon}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="1" x2="12" y2="23"></line>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-              </svg>
-            </div>
-            <div className={styles.pnlDisplayInfo}>
-              <div className={`${styles.pnlDisplayAmount} ${currentPnL >= 0 ? styles.positive : styles.negative}`}>
-                {currentPnL >= 0 ? '+' : ''}${Math.abs(currentPnL).toFixed(2)}
-              </div>
-            </div>
-          </div>
-
           {isActive && (
-            <>
-              <div className={styles.timerDivider}></div>
-              <div className={`${styles.timeDisplay} ${isAlmostExpired ? styles.warning : ''}`}>
-                <svg className={styles.timeIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <span className={styles.timeValue}>{timeRemainingFormatted}</span>
-              </div>
-            </>
+            <div className={`${styles.timeDisplay} ${isAlmostExpired ? styles.warning : ''}`}>
+              <svg className={styles.timeIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span className={styles.timeValue}>{timeRemainingFormatted}</span>
+            </div>
           )}
 
           {!isActive && (
-            <>
-              <div className={styles.timerDivider}></div>
-              <div className={styles.durationBadge}>
-                <svg className={styles.durationIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <span className={styles.durationText}>{formatDuration(duration)}</span>
-              </div>
-            </>
+            <div className={styles.durationBadge}>
+              <svg className={styles.durationIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span className={styles.durationText}>{formatDuration(duration)}</span>
+            </div>
           )}
 
           <svg

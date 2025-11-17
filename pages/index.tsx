@@ -63,9 +63,6 @@ export default function Home() {
         <div className={styles.content}>
           <TradingSimulator currentView={currentView} />
         </div>
-        <footer className={styles.footer}>
-          <iframe src={`https://ticker.polymarket.com/embed?category=Breaking News&theme=${theme}&speed=1&displayMode=classic`} width="100%" height="60" frameBorder="0" scrolling="no" style={{ border: 'none', overflow: 'hidden' }}></iframe>
-        </footer>
       </main>
     </>
   );
