@@ -28,7 +28,7 @@ export default function Home() {
         <div className={styles.header}>
           <div className={styles.logo}>
             <img src="/pitbull.png" alt="Pitbull" className={styles.logoIcon} />
-            <span>Polydogs</span>
+            <span>POLYDOGS</span>
           </div>
           <div className={styles.nav}>
             <button
