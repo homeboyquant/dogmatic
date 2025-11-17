@@ -162,6 +162,14 @@
   color: var(--text-primary);
 }
 
+.pnlDisplayAmount.positive {
+  color: #10b981;
+}
+
+.pnlDisplayAmount.negative {
+  color: #ef4444;
+}
+
 @media (max-width: 768px) {
   .pnlDisplayAmount {
     font-size: 14px;
