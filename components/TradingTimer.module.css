@@ -61,10 +61,22 @@
   user-select: none;
 }
 
+@media (max-width: 768px) {
+  .header {
+    justify-content: center;
+  }
+}
+
 .headerRight {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .headerRight {
+    gap: 8px;
+  }
 }
 
 .pnlDisplay {
@@ -77,6 +89,13 @@
   border: 1px solid rgba(139, 92, 246, 0.12);
   transition: all 0.3s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(139, 92, 246, 0.03);
+}
+
+@media (max-width: 768px) {
+  .pnlDisplay {
+    gap: 6px;
+    padding: 6px 10px;
+  }
 }
 
 .pnlDisplay:hover {
@@ -102,6 +121,13 @@
   color: #8b5cf6;
   transition: all 0.3s ease;
   box-shadow: 0 1px 2px rgba(139, 92, 246, 0.1);
+}
+
+@media (max-width: 768px) {
+  .pnlDisplayIcon {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .goalAchieved .pnlDisplayIcon {
@@ -134,6 +160,12 @@
   font-variant-numeric: tabular-nums;
   line-height: 1;
   color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .pnlDisplayAmount {
+    font-size: 14px;
+  }
 }
 
 .pnlDisplaySubtext {
@@ -313,6 +345,13 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(16, 185, 129, 0.03);
 }
 
+@media (max-width: 768px) {
+  .timeDisplay {
+    gap: 4px;
+    padding: 6px 10px;
+  }
+}
+
 .timeDisplay:hover {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(5, 150, 105, 0.08) 100%);
   border-color: rgba(16, 185, 129, 0.18);
@@ -356,6 +395,13 @@
   border-radius: 12px;
   border: 1px solid rgba(139, 92, 246, 0.12);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(139, 92, 246, 0.03);
+}
+
+@media (max-width: 768px) {
+  .durationBadge {
+    gap: 4px;
+    padding: 6px 10px;
+  }
 }
 
 .durationBadge:hover {
