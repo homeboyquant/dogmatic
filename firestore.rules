@@ -21,6 +21,15 @@ service cloud.firestore {
       }
     }
 
+    // Timer documents - one per user
+    match /timers/{userId} {
+      // Allow read/write for dogmatic1 (development)
+      allow read, write: if userId == 'dogmatic1' || userId == 'demo_user';
+
+      // For authenticated users (future):
+      // allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
     // Allow test collection for testing
     match /test_collection/{document} {
       allow read, write: if true;

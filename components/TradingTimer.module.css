@@ -36,30 +36,37 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
-  background: transparent;
-  border-radius: 10px;
-  border: 1.5px solid transparent;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.04) 0%, rgba(99, 102, 241, 0.06) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(139, 92, 246, 0.12);
   transition: all 0.3s ease;
-  box-shadow: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(139, 92, 246, 0.03);
+}
+
+.pnlDisplay:hover {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, rgba(99, 102, 241, 0.08) 100%);
+  border-color: rgba(139, 92, 246, 0.18);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(139, 92, 246, 0.05);
 }
 
 .pnlDisplay.goalAchieved {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(5, 150, 105, 0.08) 100%);
+  border-color: rgba(16, 185, 129, 0.2);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.08);
 }
 
 .pnlDisplayIcon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: transparent;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.12) 100%);
+  border-radius: 10px;
   color: #8b5cf6;
   transition: all 0.3s ease;
+  box-shadow: 0 1px 2px rgba(139, 92, 246, 0.1);
 }
 
 .goalAchieved .pnlDisplayIcon {
@@ -91,6 +98,7 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  color: var(--text-primary);
 }
 
 .pnlDisplaySubtext {
@@ -262,16 +270,23 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
-  background: transparent;
-  border-radius: 8px;
-  border: 1px solid transparent;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(5, 150, 105, 0.06) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.12);
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(16, 185, 129, 0.03);
+}
+
+.timeDisplay:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(5, 150, 105, 0.08) 100%);
+  border-color: rgba(16, 185, 129, 0.18);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(16, 185, 129, 0.05);
 }
 
 .timeDisplay.warning {
-  background: transparent;
-  border-color: transparent;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.04) 0%, rgba(217, 119, 6, 0.06) 100%);
+  border-color: rgba(245, 158, 11, 0.12);
   animation: pulse-warning 1s ease-in-out infinite;
 }
 
@@ -300,11 +315,18 @@
 .durationBadge {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  background: transparent;
-  border-radius: 6px;
-  border: 1px solid transparent;
+  gap: 6px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.04) 0%, rgba(99, 102, 241, 0.06) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(139, 92, 246, 0.03);
+}
+
+.durationBadge:hover {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, rgba(99, 102, 241, 0.08) 100%);
+  border-color: rgba(139, 92, 246, 0.18);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(139, 92, 246, 0.05);
 }
 
 .durationIcon {

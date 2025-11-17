@@ -1,45 +1,50 @@
 import { useState, useEffect, useCallback } from 'react';
-
-interface TimerState {
-  duration: number; // in minutes
-  targetTime: number | null; // timestamp when timer should end
-  isActive: boolean;
-  pnlGoal: number; // target PnL to achieve
-}
-
-const STORAGE_KEY = 'trading_timer_state';
+import { useAuth } from '@/contexts/AuthContext';
+import { timerService, TimerState } from '@/lib/timerService';
 
 export function useTimer() {
-  const [timerState, setTimerState] = useState<TimerState>(() => {
-    if (typeof window === 'undefined') {
-      return { duration: 30, targetTime: null, isActive: false, pnlGoal: 0 };
-    }
-
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        // Check if timer has expired
-        if (parsed.targetTime && parsed.targetTime < Date.now()) {
-          return { duration: parsed.duration, targetTime: null, isActive: false, pnlGoal: parsed.pnlGoal || 0 };
-        }
-        return { ...parsed, pnlGoal: parsed.pnlGoal || 0 };
-      }
-    } catch (e) {
-      console.error('Failed to load timer state:', e);
-    }
-
-    return { duration: 30, targetTime: null, isActive: false, pnlGoal: 0 };
+  const { userId } = useAuth();
+  const [timerState, setTimerState] = useState<TimerState>({
+    duration: 30,
+    targetTime: null,
+    isActive: false
   });
 
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Save to localStorage whenever state changes
+  // Load timer state from Firestore
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(timerState));
-    }
-  }, [timerState]);
+    if (!userId) return;
+
+    const loadTimerState = async () => {
+      try {
+        const state = await timerService.getTimerState(userId);
+        setTimerState(state);
+        setIsLoaded(true);
+      } catch (error) {
+        console.error('Failed to load timer state:', error);
+        setIsLoaded(true);
+      }
+    };
+
+    loadTimerState();
+  }, [userId]);
+
+  // Save to Firestore whenever state changes
+  useEffect(() => {
+    if (!userId || !isLoaded) return;
+
+    const saveTimerState = async () => {
+      try {
+        await timerService.saveTimerState(userId, timerState);
+      } catch (error) {
+        console.error('Failed to save timer state:', error);
+      }
+    };
+
+    saveTimerState();
+  }, [timerState, userId, isLoaded]);
 
   // Update time remaining
   useEffect(() => {
@@ -83,13 +88,6 @@ export function useTimer() {
     }));
   }, []);
 
-  const setPnlGoal = useCallback((pnlGoal: number) => {
-    setTimerState(prev => ({
-      ...prev,
-      pnlGoal
-    }));
-  }, []);
-
   const formatTime = useCallback((ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);
     const days = Math.floor(totalSeconds / 86400);
@@ -110,11 +108,9 @@ export function useTimer() {
     isActive: timerState.isActive,
     timeRemaining,
     timeRemainingFormatted: formatTime(timeRemaining),
-    pnlGoal: timerState.pnlGoal,
     startTimer,
     pauseTimer,
     resetTimer,
     setDuration,
-    setPnlGoal,
   };
 }
