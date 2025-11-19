@@ -531,7 +531,7 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
     }
   };
 
-  const handleClosePosition = async (portfolioPosition: { id: string; question: string; outcome: 'yes' | 'no'; entryPrice: number; shares: number; marketSlug: string }) => {
+  const handleClosePosition = async (portfolioPosition: { id: string; question: string; outcome: 'yes' | 'no'; entryPrice: number; shares: number; marketSlug: string; currentPrice?: number }) => {
     console.log('🔄 Starting close position process...', {
       id: portfolioPosition.id,
       question: portfolioPosition.question,
@@ -547,61 +547,29 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
       return;
     }
 
-    // Use the currentPrice from state (already fetched by fetch-prices API)
-    // This is the same price shown in the UI and uses bestBid/bestAsk priority
-    const currentPrice = currentPrices[portfolioPosition.id] || position.currentPrice || position.avgPrice;
+    // Use the currentPrice passed from Portfolio (highest priority),
+    // then from TradingSimulator's state, then position.currentPrice, then avgPrice
+    const currentPrice = portfolioPosition.currentPrice
+      || currentPrices[portfolioPosition.id]
+      || position.currentPrice
+      || position.avgPrice;
 
-    console.log(`✅ Using current price from state: $${currentPrice.toFixed(3)} for ${portfolioPosition.question} (${portfolioPosition.outcome})`);
+    console.log(`🔍 Close position debug:`, {
+      positionId: portfolioPosition.id,
+      fromPortfolioPassedPrice: portfolioPosition.currentPrice,
+      fromCurrentPrices: currentPrices[portfolioPosition.id],
+      fromPositionCurrentPrice: position.currentPrice,
+      fromPositionAvgPrice: position.avgPrice,
+      finalCurrentPrice: currentPrice,
+      question: portfolioPosition.question,
+      outcome: portfolioPosition.outcome
+    });
 
-    // Safeguard 1: Reject extremely low prices (< $0.01) - likely data error
-    if (currentPrice < 0.01 && currentPrice !== 0) {
-      console.error(`❌ CRITICAL: Suspiciously low price detected: $${currentPrice.toFixed(4)}`);
-      alert(
-        `❌ ERROR: Cannot close position\n\n` +
-        `Position: ${portfolioPosition.question}\n` +
-        `Detected price: $${currentPrice.toFixed(4)}\n\n` +
-        `This price is suspiciously low (< $0.01) and may be a data error.\n` +
-        `Please refresh the page and try again.`
-      );
-      return;
-    }
+    // Price is validated by the fetch-prices API, proceed directly with close
+    executeClosePosition(position, currentPrice);
+  };
 
-    // Safeguard 2: Warn about using entry price as fallback
-    if (currentPrice === position.avgPrice) {
-      console.warn('⚠️ WARNING: Using entry price as fallback. Current price not available.');
-      const confirmClose = confirm(
-        `⚠️ WARNING: Market price unavailable\n\n` +
-        `Position: ${portfolioPosition.question}\n` +
-        `Using entry price: $${position.avgPrice.toFixed(3)}\n\n` +
-        `This may not reflect the current market price.\n\n` +
-        `Do you want to continue?`
-      );
-
-      if (!confirmClose) {
-        console.log('❌ User cancelled position close');
-        return;
-      }
-    }
-
-    // Safeguard 3: Warn about large price drops (>90% drop from entry)
-    const priceChange = ((currentPrice - position.avgPrice) / position.avgPrice) * 100;
-    if (priceChange < -90 && currentPrice < 0.05) {
-      const confirmDrop = confirm(
-        `⚠️ WARNING: Large price drop detected\n\n` +
-        `Position: ${portfolioPosition.question}\n` +
-        `Entry price: $${position.avgPrice.toFixed(3)}\n` +
-        `Current price: $${currentPrice.toFixed(3)}\n` +
-        `Change: ${priceChange.toFixed(1)}%\n\n` +
-        `This represents a ${Math.abs(priceChange).toFixed(0)}% loss.\n\n` +
-        `Do you want to continue closing this position?`
-      );
-
-      if (!confirmDrop) {
-        console.log('❌ User cancelled position close due to large price drop');
-        return;
-      }
-    }
-
+  const executeClosePosition = async (position: Position, currentPrice: number) => {
     const total = position.shares * currentPrice;
     const pnl = total - position.cost;
 

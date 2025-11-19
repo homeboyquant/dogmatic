@@ -65,9 +65,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const market = data[0];
           let priceFound = false;
 
-          // Priority 1: Use outcomePrices for resolved/closed markets
-          if (market.closed || market.resolved) {
-            if (market.outcomePrices) {
+          // Priority 1: Check outcomePrices first for definitive results (near 0 or near 1)
+          // This catches resolved markets that aren't marked as closed yet
+          console.log(`🔍 Market status for ${position.marketQuestion}: closed=${market.closed}, resolved=${market.resolved}, hasOutcomePrices=${!!market.outcomePrices}`);
+
+          if (market.outcomePrices) {
+            try {
+              const prices = JSON.parse(market.outcomePrices);
+              const priceIndex = position.outcome === 'yes' ? 0 : 1;
+              const outcomePrice = parseFloat(prices[priceIndex]);
+
+              console.log(`📊 OutcomePrices for ${position.marketQuestion}: ${market.outcomePrices}, calculated price for ${position.outcome}=${outcomePrice}`);
+
+              // If outcomePrices shows definitive result (< 0.01 or > 0.99), use it immediately
+              if (isValidPrice(outcomePrice) && (outcomePrice < 0.01 || outcomePrice > 0.99)) {
+                const validation = isPriceChangeReasonable(position.currentPrice, outcomePrice);
+                if (validation.warning) {
+                  warnings.push(`${position.marketQuestion} (${position.outcome}): ${validation.warning}`);
+                }
+                priceMap[position.id] = outcomePrice;
+                console.log(`✅ ${position.marketQuestion} (${position.outcome}): DEFINITIVE outcomePrice=$${outcomePrice.toFixed(4)} (${outcomePrice < 0.01 ? 'lost' : 'won'})`);
+                priceFound = true;
+              }
+            } catch (e) {
+              console.warn(`⚠️ Failed to parse outcomePrices for ${position.marketQuestion}`);
+            }
+          }
+
+          // Priority 2: Use outcomePrices for explicitly closed/resolved markets (any price)
+          if (!priceFound && (market.closed || market.resolved) && market.outcomePrices) {
+            try {
               const prices = JSON.parse(market.outcomePrices);
               const priceIndex = position.outcome === 'yes' ? 0 : 1;
               const outcomePrice = parseFloat(prices[priceIndex]);
@@ -83,32 +110,60 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               } else {
                 console.warn(`⚠️ Invalid outcomePrice for ${position.marketQuestion}: ${outcomePrice}`);
               }
+            } catch (e) {
+              console.warn(`⚠️ Failed to parse outcomePrices for ${position.marketQuestion}`);
             }
           }
 
-          // Priority 2: Use bestBid/bestAsk from market data (for active markets)
-          if (!priceFound && market.bestBid !== undefined && market.bestAsk !== undefined) {
-            let sellPrice;
-            if (position.outcome === 'yes') {
-              sellPrice = parseFloat(market.bestBid);
-            } else {
-              sellPrice = 1 - parseFloat(market.bestAsk);
-            }
-
-            if (isValidPrice(sellPrice)) {
-              const validation = isPriceChangeReasonable(position.currentPrice, sellPrice);
-              if (validation.warning) {
-                warnings.push(`${position.marketQuestion} (${position.outcome}): ${validation.warning}`);
+          // Priority 3: Use bestBid/bestAsk OR outcomePrices if bestBid doesn't exist
+          if (!priceFound) {
+            // First try bestBid/bestAsk if available
+            if (market.bestBid !== undefined && market.bestAsk !== undefined) {
+              let sellPrice;
+              if (position.outcome === 'yes') {
+                sellPrice = parseFloat(market.bestBid);
+              } else {
+                sellPrice = 1 - parseFloat(market.bestAsk);
               }
-              priceMap[position.id] = sellPrice;
-              console.log(`✅ ${position.marketQuestion} (${position.outcome}): bestBid/ask sell price=${sellPrice.toFixed(3)}`);
-              priceFound = true;
-            } else {
-              console.warn(`⚠️ Invalid bestBid/ask price for ${position.marketQuestion}: ${sellPrice}`);
+
+              console.log(`📊 ${position.marketQuestion} (${position.outcome}): bestBid=${market.bestBid}, bestAsk=${market.bestAsk}, calculated sell price=${sellPrice.toFixed(3)}`);
+
+              if (isValidPrice(sellPrice)) {
+                const validation = isPriceChangeReasonable(position.currentPrice, sellPrice);
+                if (validation.warning) {
+                  warnings.push(`${position.marketQuestion} (${position.outcome}): ${validation.warning}`);
+                }
+                priceMap[position.id] = sellPrice;
+                console.log(`✅ ${position.marketQuestion} (${position.outcome}): using bestBid/ask sell price=${sellPrice.toFixed(3)}`);
+                priceFound = true;
+              } else {
+                console.warn(`⚠️ Invalid bestBid/ask price for ${position.marketQuestion}: ${sellPrice}`);
+              }
+            }
+
+            // If bestBid doesn't exist, use outcomePrices as replacement
+            if (!priceFound && market.outcomePrices) {
+              try {
+                const prices = JSON.parse(market.outcomePrices);
+                const priceIndex = position.outcome === 'yes' ? 0 : 1;
+                const outcomePrice = parseFloat(prices[priceIndex]);
+
+                if (isValidPrice(outcomePrice)) {
+                  const validation = isPriceChangeReasonable(position.currentPrice, outcomePrice);
+                  if (validation.warning) {
+                    warnings.push(`${position.marketQuestion} (${position.outcome}): ${validation.warning}`);
+                  }
+                  priceMap[position.id] = outcomePrice;
+                  console.log(`✅ ${position.marketQuestion} (${position.outcome}): using outcomePrices (bestBid not available)=$${outcomePrice.toFixed(4)}`);
+                  priceFound = true;
+                }
+              } catch (e) {
+                console.warn(`⚠️ Failed to parse outcomePrices for ${position.marketQuestion}`);
+              }
             }
           }
 
-          // Priority 3: Fallback to orderbook if bestBid not available
+          // Priority 4: Fallback to orderbook if bestBid not available
           if (!priceFound && market.clobTokenIds && position.marketId) {
             try {
               const tokenIds = typeof market.clobTokenIds === 'string'
@@ -141,7 +196,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
           }
 
-          // Priority 4: Use outcomePrices as fallback when bestBid/orderbook unavailable
+          // Priority 5: Use outcomePrices as fallback when bestBid/orderbook unavailable
           if (!priceFound && market.outcomePrices) {
             try {
               const prices = JSON.parse(market.outcomePrices);
@@ -173,6 +228,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       } catch (error) {
         console.error('Error fetching price for', position.marketSlug, ':', error);
         priceMap[position.id] = fallbackPrice;
+      }
+    }
+
+    // Cross-validate ALL prices by checking outcomePrices (to catch resolved markets not marked as closed)
+    console.log('🔍 Cross-validating all prices with outcomePrices...');
+    for (const position of positions) {
+      const price = priceMap[position.id];
+
+      // Cross-validate all prices, especially those that might be wrong
+      if (price !== undefined && position.marketSlug) {
+        try {
+          const response = await fetch(`https://gamma-api.polymarket.com/markets?slug=${position.marketSlug}`);
+          const data = await response.json();
+
+          if (data.length > 0) {
+            const market = data[0];
+
+            if (market.outcomePrices) {
+              const prices = JSON.parse(market.outcomePrices);
+              const priceIndex = position.outcome === 'yes' ? 0 : 1;
+              const outcomePrice = parseFloat(prices[priceIndex]);
+
+              // If outcomePrices differs significantly from our price (> 10%), use outcomePrices
+              // This catches cases where bestBid/ask is stale but outcomePrices is correct
+              const priceDiff = Math.abs(price - outcomePrice);
+              const percentDiff = price > 0 ? (priceDiff / price) * 100 : 0;
+
+              if (priceDiff > 0.05 || percentDiff > 10) {
+                console.log(`⚠️ Price mismatch for ${position.marketQuestion} (${position.outcome}): bestBid/ask=$${price.toFixed(3)} vs outcomePrices=$${outcomePrice.toFixed(3)}. Using outcomePrices.`);
+                priceMap[position.id] = outcomePrice;
+              } else {
+                console.log(`✓ Price validated for ${position.marketQuestion} (${position.outcome}): $${price.toFixed(3)} matches outcomePrices`);
+              }
+            }
+          }
+        } catch (error) {
+          console.log(`⚠️ Cross-validation failed for ${position.marketQuestion}`);
+        }
       }
     }
 

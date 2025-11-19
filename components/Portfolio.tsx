@@ -16,6 +16,7 @@ interface PortfolioPosition {
   exitPrice?: number;
   polymarketUrl?: string;
   exitNotes?: string;
+  currentPrice?: number;  // Allow passing current price when closing
 }
 
 interface PortfolioProps {
@@ -443,7 +444,11 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
                     {!position.closed && (
                       <button
                         className={styles.closeButton}
-                        onClick={() => onClose(position)}
+                        onClick={() => {
+                          // Pass the current price along with the position
+                          const { currentPrice: fetchedPrice } = calculatePnL(position);
+                          onClose({ ...position, currentPrice: fetchedPrice });
+                        }}
                       >
                         Close Position
                       </button>
