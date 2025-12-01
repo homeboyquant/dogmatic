@@ -367,7 +367,7 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
       }
 
       const existingPos = portfolio.positions.find(
-        p => p.marketId === selectedMarket.id && p.side === tradeSide
+        p => p.marketId === selectedMarket.id && p.side === tradeSide && !p.closed
       );
 
       const trade: Trade = {
@@ -394,14 +394,17 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
           positions: prev.positions.map(p =>
             p.id === existingPos.id
               ? {
-                  ...p,
-                  shares: newShares,
-                  cost: newCost,
-                  avgPrice: newAvgPrice,
-                  value: newShares * price,
-                  pnl: (newShares * price) - newCost,
-                  pnlPercent: (((newShares * price) - newCost) / newCost) * 100,
-                }
+                ...p,
+                shares: newShares,
+                cost: newCost,
+                avgPrice: newAvgPrice,
+                value: newShares * price,
+                pnl: (newShares * price) - newCost,
+                pnlPercent: (((newShares * price) - newCost) / newCost) * 100,
+                closed: false,
+                closedAt: undefined,
+                exitPrice: undefined,
+              }
               : p
           ),
           trades: [...prev.trades, trade],
@@ -435,7 +438,7 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
     } else {
       // SELL
       const existingPos = portfolio.positions.find(
-        p => p.marketId === selectedMarket.id && p.side === tradeSide
+        p => p.marketId === selectedMarket.id && p.side === tradeSide && !p.closed
       );
 
       if (!existingPos || existingPos.shares < shares) {
@@ -474,14 +477,14 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
           positions: prev.positions.map(p =>
             p.id === existingPos.id
               ? {
-                  ...p,
-                  shares: newShares,
-                  cost: newCost,
-                  avgPrice: newCost / newShares,
-                  value: newShares * price,
-                  pnl: (newShares * price) - newCost,
-                  pnlPercent: (((newShares * price) - newCost) / newCost) * 100,
-                }
+                ...p,
+                shares: newShares,
+                cost: newCost,
+                avgPrice: newCost / newShares,
+                value: newShares * price,
+                pnl: (newShares * price) - newCost,
+                pnlPercent: (((newShares * price) - newCost) / newCost) * 100,
+              }
               : p
           ),
           trades: [...prev.trades, trade],
@@ -592,15 +595,15 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
       positions: prev.positions.map(p =>
         p.id === position.id
           ? {
-              ...p,
-              closed: true,
-              closedAt: Date.now(),
-              exitPrice: currentPrice,
-              currentPrice: currentPrice,
-              value: total,
-              pnl: pnl,
-              pnlPercent: (pnl / position.cost) * 100
-            }
+            ...p,
+            closed: true,
+            closedAt: Date.now(),
+            exitPrice: currentPrice,
+            currentPrice: currentPrice,
+            value: total,
+            pnl: pnl,
+            pnlPercent: (pnl / position.cost) * 100
+          }
           : p
       ),
       trades: [...prev.trades, trade],
@@ -636,6 +639,23 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
         p.id === positionId ? { ...p, exitNotes: notes } : p
       ),
     }));
+  };
+
+  const handleDeleteTrade = async (positionId: string) => {
+    if (!userId) {
+      alert('Please log in to delete trades');
+      return;
+    }
+
+    try {
+      console.log('🗑️ Deleting trade with position ID:', positionId);
+      const updatedPortfolio = await portfolioService.deleteTradeAndPosition(userId, positionId);
+      setPortfolio(updatedPortfolio);
+      console.log('✅ Trade deleted successfully');
+    } catch (error: any) {
+      console.error('❌ Error deleting trade:', error);
+      alert(`Failed to delete trade: ${error.message}`);
+    }
   };
 
   const getPositionForMarket = (market: Market, side: 'YES' | 'NO') => {

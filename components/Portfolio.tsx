@@ -40,6 +40,7 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
   const [editExitNotesValue, setEditExitNotesValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showClosed, setShowClosed] = useState(false);
+  const [closingPosition, setClosingPosition] = useState<PortfolioPosition | null>(null);
 
   // Fetch prices function
   const fetchPrices = async () => {
@@ -444,17 +445,43 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
                     {!position.closed && (
                       <button
                         className={styles.closeButton}
-                        onClick={() => {
-                          // Pass the current price along with the position
-                          const { currentPrice: fetchedPrice } = calculatePnL(position);
-                          onClose({ ...position, currentPrice: fetchedPrice });
-                        }}
+                        onClick={() => setClosingPosition(position)}
                       >
                         Close Position
                       </button>
                     )}
                   </div>
                 </div>
+
+                {/* Confirmation Modal */}
+                {closingPosition?.id === position.id && (
+                  <div className={styles.modalOverlay}>
+                    <div className={styles.confirmationModal}>
+                      <h3 className={styles.modalTitle}>Close Position?</h3>
+                      <p className={styles.modalText}>
+                        Are you sure you want to close your position on <strong>{position.question}</strong>?
+                      </p>
+                      <div className={styles.modalActions}>
+                        <button
+                          className={styles.confirmButton}
+                          onClick={() => {
+                            const { currentPrice: fetchedPrice } = calculatePnL(position);
+                            onClose({ ...position, currentPrice: fetchedPrice });
+                            setClosingPosition(null);
+                          }}
+                        >
+                          Confirm Close
+                        </button>
+                        <button
+                          className={styles.cancelButton}
+                          onClick={() => setClosingPosition(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {editingUrlId === position.id && (
                   <div className={styles.linkEditModal}>

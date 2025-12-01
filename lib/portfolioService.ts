@@ -93,6 +93,67 @@ export class PortfolioService {
     return portfolio;
   }
 
+  async deleteTradeAndPosition(userId: string, positionId: string): Promise<Portfolio> {
+    try {
+      const portfolio = await this.getOrCreatePortfolio(userId);
+
+      // Find the position to delete
+      const positionToDelete = portfolio.positions.find(p => p.id === positionId);
+
+      if (!positionToDelete) {
+        console.error(`❌ Position not found: ${positionId}`);
+        throw new Error('Position not found');
+      }
+
+      console.log(`🗑️ Deleting position: ${positionToDelete.marketQuestion}`);
+      console.log(`💰 Original cost: $${positionToDelete.cost.toFixed(2)}`);
+
+      // Remove the position
+      portfolio.positions = portfolio.positions.filter(p => p.id !== positionId);
+
+      // Remove all trades related to this position (both BUY and SELL)
+      const tradesToRemove = portfolio.trades.filter(t => t.marketId === positionToDelete.marketId);
+      console.log(`🗑️ Removing ${tradesToRemove.length} trade(s) for this position`);
+
+      // Calculate total money spent/received on this position
+      let totalMoneyIn = 0;
+      let totalMoneyOut = 0;
+
+      tradesToRemove.forEach(trade => {
+        if (trade.action === 'BUY') {
+          totalMoneyIn += trade.total;
+          console.log(`  📉 BUY trade: -$${trade.total.toFixed(2)}`);
+        } else if (trade.action === 'SELL') {
+          totalMoneyOut += trade.total;
+          console.log(`  📈 SELL trade: +$${trade.total.toFixed(2)}`);
+        }
+      });
+
+      // Net effect: if we spent $100 and got back $81, we lost $19
+      // To reverse: add back the $19 we lost
+      const netEffect = totalMoneyOut - totalMoneyIn;
+      console.log(`💸 Net effect of position: ${netEffect >= 0 ? '+' : ''}$${netEffect.toFixed(2)}`);
+      console.log(`🔄 Reversing by adjusting balance: ${netEffect >= 0 ? '-' : '+'}$${Math.abs(netEffect).toFixed(2)}`);
+
+      // Remove the trades
+      portfolio.trades = portfolio.trades.filter(t => t.marketId !== positionToDelete.marketId);
+
+      // Adjust balance to reverse the net effect
+      portfolio.balance = portfolio.balance - netEffect;
+
+      console.log(`✅ Updated balance: $${portfolio.balance.toFixed(2)}`);
+
+      // Save the updated portfolio
+      await this.savePortfolio(userId, portfolio);
+      console.log('✅ Trade and position deleted, portfolio adjusted');
+
+      return portfolio;
+    } catch (error) {
+      console.error('❌ Error deleting trade:', error);
+      throw error;
+    }
+  }
+
   calculateStats(portfolio: Portfolio): PortfolioStats {
     const trades = portfolio.trades;
     const buys = trades.filter(t => t.action === 'BUY');
