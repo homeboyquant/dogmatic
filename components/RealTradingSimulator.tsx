@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './TradingSimulator.module.css';
 import Portfolio from './Portfolio';
-import TradingTimer from './TradingTimer';
 import Toast from './Toast';
 import type { Position, Trade, Portfolio as PortfolioType, PerformanceSnapshot } from '@/types/trading';
 import { portfolioService } from '@/lib/portfolioService';
@@ -37,12 +36,11 @@ interface Event {
 
 interface TradingSimulatorProps {
   currentView: 'trading' | 'portfolio';
-  renderTimerOnly?: boolean;
 }
 
 const INITIAL_BALANCE = 500;
 
-export default function RealTradingSimulator({ currentView, renderTimerOnly = false }: TradingSimulatorProps) {
+export default function RealTradingSimulator({ currentView }: TradingSimulatorProps) {
   const { userId } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchEvent[]>([]);
@@ -575,13 +573,8 @@ export default function RealTradingSimulator({ currentView, renderTimerOnly = fa
   // Calculate PnL
   const pnlData = realTradingService.calculatePnL(portfolio.positions);
 
-  if (renderTimerOnly) {
-    return <TradingTimer currentPnL={pnlData.realized} isInHeader={true} />;
-  }
-
   return (
     <div className={styles.container}>
-      <TradingTimer currentPnL={pnlData.realized} />
 
       {/* Toast Notification */}
       {toastMessage && (

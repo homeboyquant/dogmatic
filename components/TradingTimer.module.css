@@ -343,174 +343,153 @@
 .timeDisplay {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: #ffffff;
-  border-radius: 0;
-  border: 3px solid #000000;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #1a1a1a;
+  border-radius: 4px;
+  border: 2px solid #333333;
   transition: all 0.2s ease;
-  box-shadow: 4px 4px 0 0 #000000;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(0, 255, 100, 0.3);
   cursor: pointer;
+  position: relative;
 }
 
 @media (max-width: 768px) {
   .timeDisplay {
-    gap: 4px;
-    padding: 6px 12px;
-    border: 2px solid #000000;
-    box-shadow: 3px 3px 0 0 #000000;
+    gap: 6px;
+    padding: 8px 12px;
   }
 }
 
 .timeDisplay:hover {
-  transform: translate(1px, 1px);
-  box-shadow: 3px 3px 0 0 #000000;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(0, 255, 100, 0.5);
+  border-color: #00ff64;
 }
 
 .timeDisplay.warning {
-  background: #fef3c7;
-  border-color: #000000;
-  animation: pulse-brutal 1s ease-in-out infinite;
+  background: #2a1a1a;
+  border-color: #ff4444;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(255, 68, 68, 0.6);
+  animation: pulse-pixel 1s ease-in-out infinite;
 }
 
-@keyframes pulse-brutal {
+@keyframes pulse-pixel {
   0%, 100% {
-    transform: translate(0, 0);
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 8px rgba(255, 68, 68, 0.4);
   }
   50% {
-    transform: translate(1px, 1px);
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 16px rgba(255, 68, 68, 0.8);
   }
 }
 
 .timeIcon {
-  color: #000000;
+  color: #00ff64;
   flex-shrink: 0;
   width: 16px;
   height: 16px;
+  filter: drop-shadow(0 0 4px rgba(0, 255, 100, 0.6));
 }
 
 .timeDisplay.warning .timeIcon {
-  color: #000000;
+  color: #ff4444;
+  filter: drop-shadow(0 0 4px rgba(255, 68, 68, 0.6));
 }
 
 .timeValue {
-  font-size: 18px;
-  font-weight: 900;
+  font-size: 20px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: #000000;
-  min-width: 90px;
+  font-family: 'Courier New', Courier, monospace;
+  color: #00ff64;
+  min-width: 100px;
   text-align: left;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.1em;
   line-height: 1;
+  text-shadow:
+    0 0 8px rgba(0, 255, 100, 0.8),
+    0 0 12px rgba(0, 255, 100, 0.5);
 }
 
 .timeDisplay.warning .timeValue {
-  color: #000000;
+  color: #ff4444;
+  text-shadow:
+    0 0 8px rgba(255, 68, 68, 0.8),
+    0 0 12px rgba(255, 68, 68, 0.5);
 }
 
-/* Dark theme */
+/* Dark theme - same as light theme for pixel display */
 [data-theme="dark"] .timeDisplay {
-  background: #000000;
-  border-color: #ffffff;
-  box-shadow: 6px 6px 0 0 #ffffff;
-}
-
-[data-theme="dark"] .timeDisplay:hover {
-  box-shadow: 4px 4px 0 0 #ffffff;
+  background: #0a0a0a;
+  border-color: #1a1a1a;
 }
 
 [data-theme="dark"] .timeDisplay.warning {
-  background: #1a1a1a;
-  border-color: #ffffff;
-  box-shadow: 6px 6px 0 0 #ffffff;
-}
-
-[data-theme="dark"] .timeIcon {
-  color: #ffffff;
-}
-
-[data-theme="dark"] .timeValue {
-  color: #ffffff;
-}
-
-@media (max-width: 768px) {
-  [data-theme="dark"] .timeDisplay {
-    box-shadow: 4px 4px 0 0 #ffffff;
-  }
-
-  [data-theme="dark"] .timeDisplay:hover {
-    box-shadow: 3px 3px 0 0 #ffffff;
-  }
+  background: #1a0a0a;
 }
 
 .durationBadge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: #ffffff;
-  border-radius: 0;
-  border: 3px solid #000000;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #1a1a1a;
+  border-radius: 4px;
+  border: 2px solid #333333;
   transition: all 0.2s ease;
-  box-shadow: 4px 4px 0 0 #000000;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(139, 92, 246, 0.3);
   cursor: pointer;
+  position: relative;
 }
 
 @media (max-width: 768px) {
   .durationBadge {
-    gap: 4px;
-    padding: 6px 12px;
-    border: 2px solid #000000;
-    box-shadow: 3px 3px 0 0 #000000;
+    gap: 6px;
+    padding: 8px 12px;
   }
 }
 
 .durationBadge:hover {
-  transform: translate(1px, 1px);
-  box-shadow: 3px 3px 0 0 #000000;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(139, 92, 246, 0.5);
+  border-color: #8b5cf6;
 }
 
 .durationIcon {
-  color: #000000;
+  color: #8b5cf6;
   width: 16px;
   height: 16px;
+  filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.6));
 }
 
 .durationText {
-  font-size: 16px;
-  font-weight: 900;
-  color: #000000;
-  letter-spacing: -0.02em;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Courier New', Courier, monospace;
+  color: #8b5cf6;
+  letter-spacing: 0.1em;
   line-height: 1;
+  text-shadow:
+    0 0 8px rgba(139, 92, 246, 0.8),
+    0 0 12px rgba(139, 92, 246, 0.5);
 }
 
 /* Dark theme */
 [data-theme="dark"] .durationBadge {
-  background: #000000;
-  border-color: #ffffff;
-  box-shadow: 6px 6px 0 0 #ffffff;
-}
-
-[data-theme="dark"] .durationBadge:hover {
-  box-shadow: 4px 4px 0 0 #ffffff;
-}
-
-[data-theme="dark"] .durationIcon {
-  color: #ffffff;
-}
-
-[data-theme="dark"] .durationText {
-  color: #ffffff;
-}
-
-@media (max-width: 768px) {
-  [data-theme="dark"] .durationBadge {
-    box-shadow: 4px 4px 0 0 #ffffff;
-  }
-
-  [data-theme="dark"] .durationBadge:hover {
-    box-shadow: 3px 3px 0 0 #ffffff;
-  }
+  background: #0a0a0a;
+  border-color: #1a1a1a;
 }
 
 .display {

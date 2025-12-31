@@ -9,7 +9,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const CORRECT_PASSWORD = 'dogmatic';
+const CORRECT_PASSWORD = 'dogmatic2026';
 const AUTH_KEY = 'dogmatic_auth';
 const USER_ID_KEY = 'dogmatic_userId';
 const USER_ID = 'dogmatic1';

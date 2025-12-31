@@ -50,7 +50,7 @@ export default function LoginScreen() {
           </button>
         </form>
 
-        <div className={styles.hint}>Hint: dogmatic</div>
+        <div className={styles.hint}>Hint: dogmatic2026</div>
       </div>
     </div>
   );

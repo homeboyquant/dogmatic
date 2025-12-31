@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Position } from '@/types/trading';
-import TradingTimer from './TradingTimer';
 import PnLChart from './PnLChart';
 import styles from './Portfolio.module.css';
 
@@ -204,9 +203,6 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
 
   return (
     <div className={styles.container}>
-      {/* Trading Timer */}
-      <TradingTimer currentPnL={realizedPnL} />
-
       <div className={styles.header}>
         <h1 className={styles.title}>Portfolio</h1>
         <div className={styles.headerActions}>
