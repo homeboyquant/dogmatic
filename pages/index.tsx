@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import TradingSimulator from '@/components/TradingSimulator';
+import RealTradingSimulator from '@/components/RealTradingSimulator';
 import LoginScreen from '@/components/LoginScreen';
+import SplashScreen from '@/components/SplashScreen';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import styles from './landing.module.css';
@@ -12,6 +13,24 @@ export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const { isAuthenticated, logout } = useAuth();
   const [currentView, setCurrentView] = useState<View>('trading');
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    // Check if splash has been shown in this session
+    const splashShown = sessionStorage.getItem('splashShown');
+    if (splashShown) {
+      setShowSplash(false);
+    }
+  }, []);
+
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+    sessionStorage.setItem('splashShown', 'true');
+  };
+
+  if (showSplash) {
+    return <SplashScreen onComplete={handleSplashComplete} />;
+  }
 
   if (!isAuthenticated) {
     return <LoginScreen />;
@@ -61,7 +80,7 @@ export default function Home() {
           </div>
         </div>
         <div className={styles.content}>
-          <TradingSimulator currentView={currentView} />
+          <RealTradingSimulator currentView={currentView} />
         </div>
       </main>
     </>

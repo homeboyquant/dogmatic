@@ -18,6 +18,8 @@ export interface Position {
   closed?: boolean; // Whether position has been closed
   closedAt?: number; // Timestamp when position was closed
   exitPrice?: number; // Price at which position was closed
+  exitOrderID?: string; // Order ID for the sell transaction
+  originalShares?: number; // Original shares before closing (for display)
   exitNotes?: string; // Notes explaining why the position was closed
 }
 
@@ -46,6 +48,7 @@ export interface Portfolio {
   initialBalance: number; // Starting balance for reset tracking
   createdAt?: number; // Portfolio creation timestamp
   updatedAt?: number; // Last update timestamp
+  pnlHistory?: PerformanceSnapshot[]; // P&L snapshots over time
 }
 
 export interface PerformanceSnapshot {

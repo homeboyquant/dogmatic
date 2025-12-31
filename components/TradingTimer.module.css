@@ -345,52 +345,102 @@
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(5, 150, 105, 0.06) 100%);
-  border-radius: 12px;
-  border: 1px solid rgba(16, 185, 129, 0.12);
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(16, 185, 129, 0.03);
+  background: #ffffff;
+  border-radius: 0;
+  border: 3px solid #000000;
+  transition: all 0.2s ease;
+  box-shadow: 4px 4px 0 0 #000000;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {
   .timeDisplay {
     gap: 4px;
-    padding: 6px 10px;
+    padding: 6px 12px;
+    border: 2px solid #000000;
+    box-shadow: 3px 3px 0 0 #000000;
   }
 }
 
 .timeDisplay:hover {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(5, 150, 105, 0.08) 100%);
-  border-color: rgba(16, 185, 129, 0.18);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(16, 185, 129, 0.05);
+  transform: translate(1px, 1px);
+  box-shadow: 3px 3px 0 0 #000000;
 }
 
 .timeDisplay.warning {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.04) 0%, rgba(217, 119, 6, 0.06) 100%);
-  border-color: rgba(245, 158, 11, 0.12);
-  animation: pulse-warning 1s ease-in-out infinite;
+  background: #fef3c7;
+  border-color: #000000;
+  animation: pulse-brutal 1s ease-in-out infinite;
+}
+
+@keyframes pulse-brutal {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(1px, 1px);
+  }
 }
 
 .timeIcon {
-  color: #10b981;
+  color: #000000;
   flex-shrink: 0;
+  width: 16px;
+  height: 16px;
 }
 
 .timeDisplay.warning .timeIcon {
-  color: #f59e0b;
+  color: #000000;
 }
 
 .timeValue {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 900;
   font-variant-numeric: tabular-nums;
-  color: #10b981;
-  min-width: 100px;
+  color: #000000;
+  min-width: 90px;
   text-align: left;
+  letter-spacing: -0.02em;
+  line-height: 1;
 }
 
 .timeDisplay.warning .timeValue {
-  color: #f59e0b;
+  color: #000000;
+}
+
+/* Dark theme */
+[data-theme="dark"] .timeDisplay {
+  background: #000000;
+  border-color: #ffffff;
+  box-shadow: 6px 6px 0 0 #ffffff;
+}
+
+[data-theme="dark"] .timeDisplay:hover {
+  box-shadow: 4px 4px 0 0 #ffffff;
+}
+
+[data-theme="dark"] .timeDisplay.warning {
+  background: #1a1a1a;
+  border-color: #ffffff;
+  box-shadow: 6px 6px 0 0 #ffffff;
+}
+
+[data-theme="dark"] .timeIcon {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .timeValue {
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  [data-theme="dark"] .timeDisplay {
+    box-shadow: 4px 4px 0 0 #ffffff;
+  }
+
+  [data-theme="dark"] .timeDisplay:hover {
+    box-shadow: 3px 3px 0 0 #ffffff;
+  }
 }
 
 .durationBadge {
@@ -398,34 +448,69 @@
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.04) 0%, rgba(99, 102, 241, 0.06) 100%);
-  border-radius: 12px;
-  border: 1px solid rgba(139, 92, 246, 0.12);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(139, 92, 246, 0.03);
+  background: #ffffff;
+  border-radius: 0;
+  border: 3px solid #000000;
+  transition: all 0.2s ease;
+  box-shadow: 4px 4px 0 0 #000000;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {
   .durationBadge {
     gap: 4px;
-    padding: 6px 10px;
+    padding: 6px 12px;
+    border: 2px solid #000000;
+    box-shadow: 3px 3px 0 0 #000000;
   }
 }
 
 .durationBadge:hover {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, rgba(99, 102, 241, 0.08) 100%);
-  border-color: rgba(139, 92, 246, 0.18);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(139, 92, 246, 0.05);
+  transform: translate(1px, 1px);
+  box-shadow: 3px 3px 0 0 #000000;
 }
 
 .durationIcon {
-  color: #8b5cf6;
-  opacity: 0.7;
+  color: #000000;
+  width: 16px;
+  height: 16px;
 }
 
 .durationText {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 900;
+  color: #000000;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* Dark theme */
+[data-theme="dark"] .durationBadge {
+  background: #000000;
+  border-color: #ffffff;
+  box-shadow: 6px 6px 0 0 #ffffff;
+}
+
+[data-theme="dark"] .durationBadge:hover {
+  box-shadow: 4px 4px 0 0 #ffffff;
+}
+
+[data-theme="dark"] .durationIcon {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .durationText {
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  [data-theme="dark"] .durationBadge {
+    box-shadow: 4px 4px 0 0 #ffffff;
+  }
+
+  [data-theme="dark"] .durationBadge:hover {
+    box-shadow: 3px 3px 0 0 #ffffff;
+  }
 }
 
 .display {

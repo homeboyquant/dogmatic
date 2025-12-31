@@ -1,0 +1,81 @@
+.chartContainer {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 16px;
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.chartTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0;
+  font-family: 'Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.currentPnL {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Grotesk', monospace;
+  letter-spacing: -0.02em;
+}
+
+.currentPnL.positive {
+  color: #10b981;
+}
+
+.currentPnL.negative {
+  color: #ef4444;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.emptyChart {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.emptyChart p {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: 0;
+  font-family: 'Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@media (max-width: 768px) {
+  .chartContainer {
+    padding: 16px;
+  }
+
+  .chartHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .currentPnL {
+    font-size: 24px;
+  }
+
+  .chart {
+    overflow-x: auto;
+  }
+}

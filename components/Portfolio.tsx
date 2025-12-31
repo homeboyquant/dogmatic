@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Position } from '@/types/trading';
 import TradingTimer from './TradingTimer';
+import PnLChart from './PnLChart';
 import styles from './Portfolio.module.css';
 
 interface PortfolioPosition {
@@ -27,9 +28,12 @@ interface PortfolioProps {
   onUpdateThesis: (positionId: string, thesis: string) => void;
   onUpdatePolymarketUrl: (positionId: string, url: string) => void;
   onUpdateExitNotes: (positionId: string, notes: string) => void;
+  isProcessing?: boolean;
+  sellingPositionId?: string | null;
+  pnlHistory?: { timestamp: number; pnl: number }[];
 }
 
-export default function Portfolio({ positions, balance, initialBalance, onClose, onUpdateThesis, onUpdatePolymarketUrl, onUpdateExitNotes }: PortfolioProps) {
+export default function Portfolio({ positions, balance, initialBalance, onClose, onUpdateThesis, onUpdatePolymarketUrl, onUpdateExitNotes, isProcessing = false, sellingPositionId = null, pnlHistory = [] }: PortfolioProps) {
   const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({});
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [editingThesisId, setEditingThesisId] = useState<string | null>(null);
@@ -39,8 +43,10 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
   const [editingExitNotesId, setEditingExitNotesId] = useState<string | null>(null);
   const [editExitNotesValue, setEditExitNotesValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showClosed, setShowClosed] = useState(false);
+  const [activeView, setActiveView] = useState<'open' | 'closed' | 'chart'>('open');
   const [closingPosition, setClosingPosition] = useState<PortfolioPosition | null>(null);
+  const [pnlChartData, setPnlChartData] = useState<{ timestamp: number; pnl: number }[]>([]);
+  const [chartFilter, setChartFilter] = useState<'daily' | 'weekly' | 'all'>('all');
 
   // Fetch prices function
   const fetchPrices = async () => {
@@ -93,6 +99,12 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
     console.log('✅ Price update complete at', new Date().toLocaleTimeString());
   };
 
+  // Load P&L chart data from pnlHistory prop
+  useEffect(() => {
+    console.log('📈 Loading P&L chart data from portfolio history:', pnlHistory.length, 'points');
+    setPnlChartData(pnlHistory);
+  }, [pnlHistory]); // Reload when pnlHistory changes
+
   // Initial fetch and interval
   useEffect(() => {
     if (positions.length > 0) {
@@ -125,10 +137,27 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
     return { pnl, pnlPercent, currentPrice };
   };
 
+  // Filter chart data based on time period
+  const getFilteredChartData = () => {
+    if (chartFilter === 'all') return pnlChartData;
+
+    const now = Date.now();
+    const msPerDay = 24 * 60 * 60 * 1000;
+    let cutoffTime = now;
+
+    if (chartFilter === 'daily') {
+      cutoffTime = now - msPerDay;
+    } else if (chartFilter === 'weekly') {
+      cutoffTime = now - (7 * msPerDay);
+    }
+
+    return pnlChartData.filter(point => point.timestamp >= cutoffTime);
+  };
+
   // Filter positions based on view
   const openPositions = positions.filter(pos => !pos.closed);
   const closedPositions = positions.filter(pos => pos.closed);
-  const displayPositions = showClosed ? closedPositions : openPositions;
+  const displayPositions = activeView === 'closed' ? closedPositions : openPositions;
 
   // Total P&L from all positions (sum of individual P&Ls)
   const totalPnL = positions.reduce((sum, pos) => {
@@ -208,14 +237,6 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
 
       <div className={styles.summary}>
         <div className={styles.summaryCard}>
-          <div className={styles.summaryLabel}>Total Portfolio</div>
-          <div className={styles.summaryValue}>${totalPortfolioValue.toFixed(2)}</div>
-        </div>
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryLabel}>Cash Balance</div>
-          <div className={styles.summaryValue}>${cashBalance.toFixed(2)}</div>
-        </div>
-        <div className={styles.summaryCard}>
           <div className={styles.summaryLabel}>Open Positions Value</div>
           <div className={styles.summaryValue}>${openPositionsValue.toFixed(2)}</div>
         </div>
@@ -235,36 +256,70 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
 
       <div className={styles.toggleContainer}>
         <button
-          className={`${styles.toggleButton} ${!showClosed ? styles.active : ''}`}
-          onClick={() => setShowClosed(false)}
+          className={`${styles.toggleButton} ${activeView === 'open' ? styles.active : ''}`}
+          onClick={() => setActiveView('open')}
         >
           Open Positions ({openPositions.length})
         </button>
         <button
-          className={`${styles.toggleButton} ${showClosed ? styles.active : ''}`}
-          onClick={() => setShowClosed(true)}
+          className={`${styles.toggleButton} ${activeView === 'closed' ? styles.active : ''}`}
+          onClick={() => setActiveView('closed')}
         >
           Closed Positions ({closedPositions.length})
         </button>
+        <button
+          className={`${styles.toggleButton} ${activeView === 'chart' ? styles.active : ''}`}
+          onClick={() => setActiveView('chart')}
+        >
+          P&L Chart
+        </button>
       </div>
 
-      <div className={styles.positions}>
-        {displayPositions.length === 0 ? (
-          <div className={styles.empty}>
-            <div className={styles.emptyIcon}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="20" x2="18" y2="10"></line>
-                <line x1="12" y1="20" x2="12" y2="4"></line>
-                <line x1="6" y1="20" x2="6" y2="14"></line>
-              </svg>
-            </div>
-            <div className={styles.emptyText}>No {showClosed ? 'closed' : 'open'} positions</div>
-            <div className={styles.emptySubtext}>
-              {showClosed ? 'No positions have been closed yet' : 'Start trading to build your portfolio'}
-            </div>
+      {activeView === 'chart' ? (
+        <div>
+          {/* Chart Filter Buttons */}
+          <div className={styles.chartFilterContainer}>
+            <button
+              className={`${styles.chartFilterButton} ${chartFilter === 'daily' ? styles.activeFilter : ''}`}
+              onClick={() => setChartFilter('daily')}
+            >
+              Daily
+            </button>
+            <button
+              className={`${styles.chartFilterButton} ${chartFilter === 'weekly' ? styles.activeFilter : ''}`}
+              onClick={() => setChartFilter('weekly')}
+            >
+              Weekly
+            </button>
+            <button
+              className={`${styles.chartFilterButton} ${chartFilter === 'all' ? styles.activeFilter : ''}`}
+              onClick={() => setChartFilter('all')}
+            >
+              All Time
+            </button>
           </div>
-        ) : (
-          displayPositions.map((position) => {
+
+          {/* P&L Chart */}
+          <PnLChart data={getFilteredChartData()} width={800} height={300} />
+        </div>
+      ) : (
+        <div className={styles.positions}>
+          {displayPositions.length === 0 ? (
+            <div className={styles.empty}>
+              <div className={styles.emptyIcon}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="20" x2="18" y2="10"></line>
+                  <line x1="12" y1="20" x2="12" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+              </div>
+              <div className={styles.emptyText}>No {activeView === 'closed' ? 'closed' : 'open'} positions</div>
+              <div className={styles.emptySubtext}>
+                {activeView === 'closed' ? 'No positions have been closed yet' : 'Start trading to build your portfolio'}
+              </div>
+            </div>
+          ) : (
+            displayPositions.map((position) => {
             const { pnl, pnlPercent, currentPrice } = calculatePnL(position);
 
             return (
@@ -444,10 +499,18 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
                     )}
                     {!position.closed && (
                       <button
-                        className={styles.closeButton}
+                        className={styles.sellButton}
                         onClick={() => setClosingPosition(position)}
+                        disabled={sellingPositionId === position.id}
                       >
-                        Close Position
+                        {sellingPositionId === position.id ? (
+                          <>
+                            <span className={styles.buttonSpinner}></span>
+                            Selling...
+                          </>
+                        ) : (
+                          <>🚀 Sell Position</>
+                        )}
                       </button>
                     )}
                   </div>
@@ -457,10 +520,32 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
                 {closingPosition?.id === position.id && (
                   <div className={styles.modalOverlay}>
                     <div className={styles.confirmationModal}>
-                      <h3 className={styles.modalTitle}>Close Position?</h3>
+                      <h3 className={styles.modalTitle}>Sell Position?</h3>
                       <p className={styles.modalText}>
-                        Are you sure you want to close your position on <strong>{position.question}</strong>?
+                        Sell your <strong>{position.outcome.toUpperCase()}</strong> position on <strong>{position.question}</strong>?
                       </p>
+                      <div className={styles.sellPreview}>
+                        <div className={styles.sellPreviewRow}>
+                          <span>Shares:</span>
+                          <span>{position.shares.toFixed(2)}</span>
+                        </div>
+                        <div className={styles.sellPreviewRow}>
+                          <span>Current Price:</span>
+                          <span>${calculatePnL(position).currentPrice.toFixed(3)}</span>
+                        </div>
+                        <div className={styles.sellPreviewRow}>
+                          <span>Estimated Value:</span>
+                          <span className={calculatePnL(position).pnl >= 0 ? styles.positive : styles.negative}>
+                            ${(calculatePnL(position).currentPrice * position.shares).toFixed(2)}
+                          </span>
+                        </div>
+                        <div className={styles.sellPreviewRow}>
+                          <span>Est. P&L:</span>
+                          <span className={calculatePnL(position).pnl >= 0 ? styles.positive : styles.negative}>
+                            {calculatePnL(position).pnl >= 0 ? '+' : ''}${calculatePnL(position).pnl.toFixed(2)} ({calculatePnL(position).pnl >= 0 ? '+' : ''}{calculatePnL(position).pnlPercent.toFixed(2)}%)
+                          </span>
+                        </div>
+                      </div>
                       <div className={styles.modalActions}>
                         <button
                           className={styles.confirmButton}
@@ -469,12 +554,19 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
                             onClose({ ...position, currentPrice: fetchedPrice });
                             setClosingPosition(null);
                           }}
+                          disabled={isProcessing || sellingPositionId === position.id}
                         >
-                          Confirm Close
+                          {sellingPositionId === position.id ? (
+                            <>
+                              <span className={styles.spinner}></span>
+                              Selling...
+                            </>
+                          ) : 'Confirm Sell'}
                         </button>
                         <button
                           className={styles.cancelButton}
                           onClick={() => setClosingPosition(null)}
+                          disabled={isProcessing || sellingPositionId === position.id}
                         >
                           Cancel
                         </button>
@@ -531,10 +623,11 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
                   </div>
                 )}
               </div>
-            );
-          })
-        )}
-      </div>
+              );
+            })
+          )}
+        </div>
+      )}
     </div>
   );
 }
