@@ -49,8 +49,6 @@ export default function LoginScreen() {
             </svg>
           </button>
         </form>
-
-        <div className={styles.hint}>Hint: dogmatic2026</div>
       </div>
     </div>
   );
