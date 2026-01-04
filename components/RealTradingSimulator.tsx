@@ -672,8 +672,8 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
         </div>
       </div>
 
-      {/* Leaderboard */}
-      <Leaderboard timeWindow="1d" limit={10} />
+      {/* Leaderboard - only show when no event is selected */}
+      {!event && <Leaderboard timeWindow="1d" limit={10} />}
 
       {/* Event Display */}
       {event && (
