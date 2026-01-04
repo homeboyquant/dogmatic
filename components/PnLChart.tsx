@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './PnLChart.module.css';
-
+// pnl
 interface PnLDataPoint {
   timestamp: number;
   pnl: number;
@@ -70,8 +70,8 @@ export default function PnLChart({ data, width = 800, height = 180 }: PnLChartPr
   const xAxisCount = Math.min(5, data.length);
   const xAxisIndices = data.length > 0
     ? Array.from({ length: xAxisCount }, (_, i) =>
-        Math.floor((i / Math.max(1, xAxisCount - 1)) * (data.length - 1))
-      )
+      Math.floor((i / Math.max(1, xAxisCount - 1)) * (data.length - 1))
+    )
     : [];
 
   return (
