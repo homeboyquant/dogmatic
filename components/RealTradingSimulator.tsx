@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './TradingSimulator.module.css';
 import Portfolio from './Portfolio';
 import Toast from './Toast';
+import Leaderboard from './Leaderboard';
 import type { Position, Trade, Portfolio as PortfolioType, PerformanceSnapshot } from '@/types/trading';
 import { portfolioService } from '@/lib/portfolioService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -670,6 +671,9 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
           </div>
         </div>
       </div>
+
+      {/* Leaderboard */}
+      <Leaderboard timeWindow="1d" limit={10} />
 
       {/* Event Display */}
       {event && (
