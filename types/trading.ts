@@ -1,5 +1,6 @@
 export interface Position {
   id: string;
+  orderID: string; // Original buy order ID - required for selling
   marketId: string;
   marketQuestion: string;
   marketSlug?: string; // Market slug for fetching updates

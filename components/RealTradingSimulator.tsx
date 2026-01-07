@@ -109,7 +109,7 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
         if (result.success && result.positions.length > 0) {
           // Merge Polymarket positions with existing portfolio
           // Keep local positions and add any new Polymarket positions
-          const localPositionIds = new Set(portfolio.positions.map(p => p.id));
+          const localPositionIds = new Set((portfolio.positions || []).map(p => p.id));
           const newPositions = result.positions.filter(p => !localPositionIds.has(p.id));
 
           if (newPositions.length > 0) {
@@ -117,7 +117,7 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
 
             const updatedPortfolio = {
               ...portfolio,
-              positions: [...portfolio.positions, ...newPositions],
+              positions: [...(portfolio.positions || []), ...newPositions],
             };
 
             setPortfolio(updatedPortfolio);
@@ -157,8 +157,8 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
 
     const currentSnapshot = JSON.stringify({
       balance: portfolio.balance,
-      positions: portfolio.positions.map(p => ({ id: p.id, shares: p.shares, cost: p.cost })),
-      trades: portfolio.trades,
+      positions: (portfolio.positions || []).map(p => ({ id: p.id, shares: p.shares, cost: p.cost })),
+      trades: portfolio.trades || [],
     });
 
     if (currentSnapshot !== lastSavedPortfolio.current) {
@@ -191,10 +191,10 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
 
   // Fetch prices for open positions
   useEffect(() => {
-    if (portfolio.positions.length === 0) return;
+    if (!portfolio.positions || portfolio.positions.length === 0) return;
 
     const fetchPrices = async () => {
-      const convertedPositions = portfolio.positions.map(pos => ({
+      const convertedPositions = (portfolio.positions || []).map(pos => ({
         id: pos.id,
         marketId: pos.marketId,
         outcome: pos.side.toLowerCase() as 'yes' | 'no',
@@ -437,7 +437,7 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
   const executeSell = async (positionId: string, percentage: number = 100) => {
     if (!userId) return;
 
-    const position = portfolio.positions.find(p => p.id === positionId);
+    const position = (portfolio.positions || []).find(p => p.id === positionId);
     if (!position) {
       alert('Position not found');
       return;
@@ -465,7 +465,7 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
 
       const result = await realTradingService.executeSell(
         tokenId,
-        position.id, // Using position ID as order ID
+        position.orderID, // Use the original buy order ID for selling
         percentage,
         {
           marketId: position.marketId,
@@ -546,7 +546,7 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
   };
 
   // Convert positions for Portfolio component
-  const convertedPositions = portfolio.positions.map(pos => ({
+  const convertedPositions = (portfolio.positions || []).map(pos => ({
     id: pos.id,
     question: pos.marketQuestion,
     outcome: pos.side.toLowerCase() as 'yes' | 'no',

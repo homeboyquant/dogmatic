@@ -155,7 +155,7 @@ class RealTradingService {
     thesis?: string
   ): Promise<PortfolioType> {
     // Find existing position or create new one
-    const existingPos = currentPortfolio.positions.find(
+    const existingPos = (currentPortfolio.positions || []).find(
       p => p.marketId === marketData.marketId && p.side === trade.side && !p.closed
     );
 
@@ -178,7 +178,7 @@ class RealTradingService {
       const newCost = existingPos.cost + trade.totalUsdFilled;
       const newAvgPrice = newCost / newShares;
 
-      const updatedPositions = currentPortfolio.positions.map(p =>
+      const updatedPositions = (currentPortfolio.positions || []).map(p =>
         p.id === existingPos.id
           ? {
               ...p,
@@ -195,7 +195,7 @@ class RealTradingService {
       const updatedPortfolio = {
         ...currentPortfolio,
         positions: updatedPositions,
-        trades: [...currentPortfolio.trades, firestoreTrade],
+        trades: [...(currentPortfolio.trades || []), firestoreTrade],
       };
 
       await portfolioService.savePortfolio(userId, updatedPortfolio);
@@ -204,6 +204,7 @@ class RealTradingService {
       // Create new position
       const newPosition: Position = {
         id: trade.orderID,
+        orderID: trade.orderID, // Store original buy order ID for selling
         marketId: marketData.marketId,
         marketQuestion: marketData.marketQuestion,
         marketSlug: marketData.marketSlug,
@@ -222,8 +223,8 @@ class RealTradingService {
 
       const updatedPortfolio = {
         ...currentPortfolio,
-        positions: [...currentPortfolio.positions, newPosition],
-        trades: [...currentPortfolio.trades, firestoreTrade],
+        positions: [...(currentPortfolio.positions || []), newPosition],
+        trades: [...(currentPortfolio.trades || []), firestoreTrade],
       };
 
       await portfolioService.savePortfolio(userId, updatedPortfolio);
@@ -241,7 +242,7 @@ class RealTradingService {
     currentPrice: number,
     positionId: string
   ): Promise<PortfolioType> {
-    const position = currentPortfolio.positions.find(p => p.id === positionId);
+    const position = (currentPortfolio.positions || []).find(p => p.id === positionId);
     if (!position) {
       throw new Error('Position not found');
     }
@@ -269,7 +270,7 @@ class RealTradingService {
       const originalShares = position.shares;
       const realizedPnL = (currentPrice - position.avgPrice) * originalShares;
 
-      updatedPositions = currentPortfolio.positions.map(p =>
+      updatedPositions = (currentPortfolio.positions || []).map(p =>
         p.id === positionId
           ? {
               ...p,
@@ -288,7 +289,7 @@ class RealTradingService {
     } else {
       // Partially close position
       const newCost = position.cost - soldCost;
-      updatedPositions = currentPortfolio.positions.map(p =>
+      updatedPositions = (currentPortfolio.positions || []).map(p =>
         p.id === positionId
           ? {
               ...p,
@@ -306,7 +307,7 @@ class RealTradingService {
     const updatedPortfolio = {
       ...currentPortfolio,
       positions: updatedPositions,
-      trades: [...currentPortfolio.trades, firestoreTrade],
+      trades: [...(currentPortfolio.trades || []), firestoreTrade],
     };
 
     await portfolioService.savePortfolio(userId, updatedPortfolio);
@@ -317,14 +318,16 @@ class RealTradingService {
    * Calculate total PnL from positions
    */
   calculatePnL(positions: Position[]): { total: number; realized: number; unrealized: number } {
-    const realized = positions
+    const safePositions = positions || [];
+
+    const realized = safePositions
       .filter(p => p.closed)
       .reduce((sum, p) => {
         const exitPrice = p.exitPrice || p.avgPrice;
         return sum + ((exitPrice - p.avgPrice) * p.shares);
       }, 0);
 
-    const unrealized = positions
+    const unrealized = safePositions
       .filter(p => !p.closed)
       .reduce((sum, p) => sum + p.pnl, 0);
 
