@@ -40,6 +40,7 @@ function generateAuthHeaders(
     'POLY-SIGNATURE': signature,
     'POLY-TIMESTAMP': timestamp,
     'POLY-PASSPHRASE': credentials.passPhrase,
+    'POLY-API-KEY': credentials.apiKey,
   };
 }
 

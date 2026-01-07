@@ -299,8 +299,18 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
   };
 
   const getBestPrice = (market: Market, side: 'YES' | 'NO'): number => {
-    const prices = JSON.parse(market.outcomePrices);
-    return side === 'YES' ? parseFloat(prices[0]) : parseFloat(prices[1]);
+    if (!market.outcomePrices) {
+      return 0.5; // Default price if no outcome prices available
+    }
+    try {
+      const prices = typeof market.outcomePrices === 'string'
+        ? JSON.parse(market.outcomePrices)
+        : market.outcomePrices;
+      return side === 'YES' ? parseFloat(prices[0]) : parseFloat(prices[1]);
+    } catch (error) {
+      console.error('Error parsing outcome prices:', error);
+      return 0.5; // Default price on parse error
+    }
   };
 
   const getTokenId = (market: Market, side: 'YES' | 'NO'): string | null => {

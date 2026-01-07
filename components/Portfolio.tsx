@@ -42,10 +42,12 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
   const [editingExitNotesId, setEditingExitNotesId] = useState<string | null>(null);
   const [editExitNotesValue, setEditExitNotesValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [activeView, setActiveView] = useState<'open' | 'closed' | 'chart'>('open');
+  const [activeView, setActiveView] = useState<'open' | 'closed' | 'chart' | 'account'>('open');
   const [closingPosition, setClosingPosition] = useState<PortfolioPosition | null>(null);
   const [pnlChartData, setPnlChartData] = useState<{ timestamp: number; pnl: number }[]>([]);
   const [chartFilter, setChartFilter] = useState<'daily' | 'weekly' | 'all'>('all');
+  const [accountPositions, setAccountPositions] = useState<any[]>([]);
+  const [loadingAccountPositions, setLoadingAccountPositions] = useState(false);
 
   // Fetch prices function
   const fetchPrices = async () => {
@@ -103,6 +105,32 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
     console.log('📈 Loading P&L chart data from portfolio history:', pnlHistory.length, 'points');
     setPnlChartData(pnlHistory);
   }, [pnlHistory]); // Reload when pnlHistory changes
+
+  // Fetch account positions from Polymarket
+  const fetchAccountPositions = async () => {
+    setLoadingAccountPositions(true);
+    try {
+      console.log('🔍 Fetching real account positions from Polymarket...');
+      const response = await fetch('/api/account-positions');
+
+      if (!response.ok) throw new Error('Failed to fetch account positions');
+
+      const data = await response.json();
+      console.log('✅ Account positions loaded:', data.length, 'positions');
+      setAccountPositions(data);
+    } catch (error) {
+      console.error('❌ Error fetching account positions:', error);
+    } finally {
+      setLoadingAccountPositions(false);
+    }
+  };
+
+  // Fetch account positions when switching to account view
+  useEffect(() => {
+    if (activeView === 'account') {
+      fetchAccountPositions();
+    }
+  }, [activeView]);
 
   // Initial fetch and interval
   useEffect(() => {
@@ -269,6 +297,12 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
         >
           P&L Chart
         </button>
+        <button
+          className={`${styles.toggleButton} ${activeView === 'account' ? styles.active : ''}`}
+          onClick={() => setActiveView('account')}
+        >
+          Account Mode
+        </button>
       </div>
 
       {activeView === 'chart' ? (
@@ -297,6 +331,143 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
 
           {/* P&L Chart */}
           <PnLChart data={getFilteredChartData()} width={800} height={300} />
+        </div>
+      ) : activeView === 'account' ? (
+        <div className={styles.accountMode}>
+          <div className={styles.accountHeader}>
+            <h3 className={styles.accountTitle}>Real Polymarket Account Positions</h3>
+            <button
+              className={styles.refreshButton}
+              onClick={fetchAccountPositions}
+              disabled={loadingAccountPositions}
+            >
+              <svg
+                className={`${styles.refreshIcon} ${loadingAccountPositions ? styles.spinning : ''}`}
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+              >
+                <path
+                  d="M13.65 2.35A7.958 7.958 0 008 0a8 8 0 100 16 7.938 7.938 0 005.308-2.036l-1.416-1.414A5.98 5.98 0 018 14a6 6 0 116-6h-2l3-3 3 3h-2a8 8 0 01-2.35 5.65z"
+                  fill="currentColor"
+                />
+              </svg>
+              {loadingAccountPositions ? 'Loading...' : 'Refresh'}
+            </button>
+          </div>
+
+          {loadingAccountPositions ? (
+            <div className={styles.loading}>
+              <div className={styles.spinner}></div>
+              <p>Loading account positions...</p>
+            </div>
+          ) : accountPositions.length === 0 ? (
+            <div className={styles.empty}>
+              <div className={styles.emptyText}>No positions found in your Polymarket account</div>
+            </div>
+          ) : (
+            <div className={styles.positions}>
+              {accountPositions.map((position: any) => {
+                const costBasis = position.avgPrice * position.size;
+                const sellValue = position.curPrice * position.size;
+
+                return (
+                  <div key={position.asset} className={styles.positionCard}>
+                    <div className={styles.positionHeader}>
+                      {position.icon && (
+                        <img src={position.icon} alt={position.title} className={styles.eventImage} />
+                      )}
+                      <div className={styles.positionHeaderContent}>
+                        <div className={styles.positionQuestion}>
+                          {position.title}
+                        </div>
+                        <div className={`${styles.positionOutcome} ${position.outcome === 'Yes' ? styles.yes : styles.no}`}>
+                          {position.outcome.toUpperCase()}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.positionDetails}>
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Entry Price</span>
+                        <span className={styles.detailValue}>${position.avgPrice.toFixed(3)}</span>
+                      </div>
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Current Sell Price</span>
+                        <span className={styles.detailValue}>${position.curPrice.toFixed(3)}</span>
+                      </div>
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Shares</span>
+                        <span className={styles.detailValue}>{position.size.toFixed(2)}</span>
+                      </div>
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Cost Basis</span>
+                        <span className={styles.detailValue}>${costBasis.toFixed(2)}</span>
+                      </div>
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Current Sell Value</span>
+                        <span className={`${styles.detailValue} ${position.cashPnl >= 0 ? styles.positive : styles.negative}`}>
+                          ${sellValue.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={styles.positionThesis}>
+                      <div className={styles.thesisHeader}>
+                        <div className={styles.thesisLabel}>Trade Thesis</div>
+                      </div>
+                      <div className={styles.thesisText}>
+                        Real position from your Polymarket account
+                      </div>
+                    </div>
+
+                    <div className={styles.positionPnL}>
+                      <div className={`${styles.pnlValue} ${position.cashPnl >= 0 ? styles.positive : styles.negative}`}>
+                        {position.cashPnl >= 0 ? '+' : ''}${position.cashPnl.toFixed(2)} ({position.percentPnl >= 0 ? '+' : ''}{position.percentPnl.toFixed(2)}%)
+                      </div>
+                      <div className={styles.positionActions}>
+                        {position.eventSlug && (
+                          <a
+                            href={`https://polymarket.com/event/${position.eventSlug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.viewOnPolymarketButton}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                              <polyline points="15 3 21 3 21 9"></polyline>
+                              <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                            View on Polymarket
+                          </a>
+                        )}
+                        <button
+                          className={styles.sellButton}
+                          onClick={() => {
+                            // Since this position was bought externally (not through homeboyapi),
+                            // we don't have the order_id needed for selling via API.
+                            // Direct users to Polymarket.com to sell
+                            if (position.eventSlug) {
+                              const polymarketUrl = `https://polymarket.com/event/${position.eventSlug}`;
+                              if (confirm(`This position was bought externally and needs to be sold on Polymarket.com.\n\nOpen "${position.title}" on Polymarket?`)) {
+                                window.open(polymarketUrl, '_blank');
+                              }
+                            } else {
+                              alert('This position was bought externally. Please visit polymarket.com to sell it.');
+                            }
+                          }}
+                        >
+                          🚀 Sell on Polymarket
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       ) : (
         <div className={styles.positions}>
