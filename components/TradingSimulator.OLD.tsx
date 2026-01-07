@@ -410,8 +410,10 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
           trades: [...prev.trades, trade],
         }));
       } else {
+        const positionId = Date.now().toString();
         const position: Position = {
-          id: Date.now().toString(),
+          id: positionId,
+          orderID: positionId, // Use position ID as order ID for simulated trades
           marketId: selectedMarket.id,
           marketQuestion: selectedMarket.question,
           marketSlug: selectedMarket.slug,

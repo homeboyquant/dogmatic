@@ -226,6 +226,7 @@ class PolymarketService {
       // Create position
       const position: Position = {
         id: buyOrders[0].id, // Use first buy order ID
+        orderID: buyOrders[0].id, // Store original buy order ID for selling
         marketId: marketInfo.id,
         marketQuestion: marketInfo.question,
         marketSlug: marketInfo.slug,
