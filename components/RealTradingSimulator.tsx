@@ -563,7 +563,16 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
 
     // Persist to Firestore
     if (userId) {
-      await portfolioService.savePortfolio(userId, updatedPortfolio);
+      try {
+        await portfolioService.savePortfolio(userId, updatedPortfolio);
+        console.log('✅ Polymarket URL saved to Firestore');
+        setToastMessage('Polymarket link saved!');
+        setToastType('success');
+      } catch (error: any) {
+        console.error('❌ Failed to save Polymarket URL:', error);
+        setToastMessage('Failed to save link: ' + error.message);
+        setToastType('error');
+      }
     }
   };
 
