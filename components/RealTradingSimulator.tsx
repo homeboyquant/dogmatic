@@ -443,25 +443,42 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
       return;
     }
 
-    // Find the market for this position
-    const market = event?.markets.find(m => m.id === position.marketId);
-    if (!market) {
-      alert('Market not found. Please search for the market first.');
-      return;
-    }
-
-    const tokenId = getTokenId(market, position.side);
-    if (!tokenId) {
-      alert('Token ID not found');
-      return;
-    }
-
-    const currentPrice = currentPrices[position.id] || position.avgPrice;
-
     setTradingInProgress(true);
+    setSellingPositionId(positionId);
 
     try {
-      console.log('🔴 Executing real SELL order...');
+      console.log('🔴 Executing real SELL order for position:', position.marketQuestion);
+
+      // Get token ID - use stored tokenId first (most reliable), then try alternatives
+      let tokenId: string | null = position.tokenId || null;
+      console.log('📋 Position tokenId from storage:', tokenId);
+
+      // If not stored, try to get from loaded event markets
+      if (!tokenId) {
+        console.log('⚠️ No tokenId in position, trying from loaded event...');
+        const market = event?.markets.find(m => m.id === position.marketId);
+        if (market) {
+          tokenId = getTokenId(market, position.side);
+        }
+      }
+
+      // If still not found and we have a market slug, fetch from API
+      if (!tokenId && position.marketSlug) {
+        console.log('🔍 Fetching token ID from API using market slug:', position.marketSlug);
+        const { getTokenIdForMarket } = await import('@/lib/tradingApi');
+        tokenId = await getTokenIdForMarket(position.marketSlug, position.side);
+      }
+
+      if (!tokenId) {
+        alert('Token ID not found. Unable to execute sell order. Please contact support.');
+        setSellingPositionId(null);
+        setTradingInProgress(false);
+        return;
+      }
+
+      console.log('✅ Token ID found:', tokenId);
+
+      const currentPrice = currentPrices[position.id] || position.avgPrice;
 
       const result = await realTradingService.executeSell(
         tokenId,
@@ -524,25 +541,43 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
     await executeSell(portfolioPosition.id, 100);
   };
 
-  const handleUpdateThesis = (positionId: string, thesis: string) => {
-    setPortfolio(prev => ({
-      ...prev,
-      positions: prev.positions.map(p => p.id === positionId ? { ...p, thesis } : p),
-    }));
+  const handleUpdateThesis = async (positionId: string, thesis: string) => {
+    const updatedPortfolio = {
+      ...portfolio,
+      positions: (portfolio.positions || []).map(p => p.id === positionId ? { ...p, thesis } : p),
+    };
+    setPortfolio(updatedPortfolio);
+
+    // Persist to Firestore
+    if (userId) {
+      await portfolioService.savePortfolio(userId, updatedPortfolio);
+    }
   };
 
-  const handleUpdatePolymarketUrl = (positionId: string, url: string) => {
-    setPortfolio(prev => ({
-      ...prev,
-      positions: prev.positions.map(p => p.id === positionId ? { ...p, polymarketUrl: url } : p),
-    }));
+  const handleUpdatePolymarketUrl = async (positionId: string, url: string) => {
+    const updatedPortfolio = {
+      ...portfolio,
+      positions: (portfolio.positions || []).map(p => p.id === positionId ? { ...p, polymarketUrl: url } : p),
+    };
+    setPortfolio(updatedPortfolio);
+
+    // Persist to Firestore
+    if (userId) {
+      await portfolioService.savePortfolio(userId, updatedPortfolio);
+    }
   };
 
-  const handleUpdateExitNotes = (positionId: string, notes: string) => {
-    setPortfolio(prev => ({
-      ...prev,
-      positions: prev.positions.map(p => p.id === positionId ? { ...p, exitNotes: notes } : p),
-    }));
+  const handleUpdateExitNotes = async (positionId: string, notes: string) => {
+    const updatedPortfolio = {
+      ...portfolio,
+      positions: (portfolio.positions || []).map(p => p.id === positionId ? { ...p, exitNotes: notes } : p),
+    };
+    setPortfolio(updatedPortfolio);
+
+    // Persist to Firestore
+    if (userId) {
+      await portfolioService.savePortfolio(userId, updatedPortfolio);
+    }
   };
 
   // Convert positions for Portfolio component

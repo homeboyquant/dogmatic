@@ -205,6 +205,7 @@ class RealTradingService {
       const newPosition: Position = {
         id: trade.orderID,
         orderID: trade.orderID, // Store original buy order ID for selling
+        tokenId: trade.tokenId, // Store token ID for selling
         marketId: marketData.marketId,
         marketQuestion: marketData.marketQuestion,
         marketSlug: marketData.marketSlug,

@@ -47,12 +47,27 @@ export class PortfolioService {
     try {
       const docRef = doc(db, COLLECTION, userId);
 
+      // Validate positions have required fields
+      const validatedPositions = portfolio.positions.map(p => {
+        // Check for required fields
+        if (!p.orderID) {
+          console.warn(`⚠️ Position missing orderID, using id as fallback: ${p.marketQuestion}`);
+          p.orderID = p.id;
+        }
+        if (!p.tokenId) {
+          console.error(`❌ Position missing tokenId! This will prevent selling: ${p.marketQuestion}`);
+          // Don't auto-fix here, let it fail so we know there's a problem
+          throw new Error(`Position "${p.marketQuestion}" is missing required tokenId field. Cannot save to Firestore.`);
+        }
+        return p;
+      });
+
       // Clean undefined values from portfolio data (Firestore doesn't accept undefined)
       const cleanPortfolioData = JSON.parse(JSON.stringify({
         ...portfolio,
         updatedAt: Date.now(),
         // Clean positions array
-        positions: portfolio.positions.map(p => {
+        positions: validatedPositions.map(p => {
           const cleanPos: any = {};
           Object.keys(p).forEach(key => {
             if ((p as any)[key] !== undefined) {

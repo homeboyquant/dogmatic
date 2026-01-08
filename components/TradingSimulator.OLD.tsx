@@ -414,6 +414,7 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
         const position: Position = {
           id: positionId,
           orderID: positionId, // Use position ID as order ID for simulated trades
+          tokenId: 'simulated', // Placeholder for simulated trades
           marketId: selectedMarket.id,
           marketQuestion: selectedMarket.question,
           marketSlug: selectedMarket.slug,
