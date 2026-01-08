@@ -82,7 +82,9 @@ class RealTradingService {
           status: response.response.status,
         };
 
-        console.log(`✅ Buy executed successfully! Order ID: ${trade.orderID}`);
+        console.log(`✅ Buy executed successfully!`);
+        console.log(`  📋 Order ID: ${trade.orderID}`);
+        console.log(`  🎫 Token ID: ${trade.tokenId}`);
         return { success: true, trade };
       } else {
         console.error('❌ Buy failed:', response);
@@ -202,6 +204,7 @@ class RealTradingService {
       return updatedPortfolio;
     } else {
       // Create new position
+      console.log(`📦 Creating new position with tokenId: ${trade.tokenId}`);
       const newPosition: Position = {
         id: trade.orderID,
         orderID: trade.orderID, // Store original buy order ID for selling
@@ -221,6 +224,13 @@ class RealTradingService {
         timestamp: trade.timestamp,
         thesis,
       };
+
+      console.log(`✅ Position created:`, {
+        id: newPosition.id,
+        orderID: newPosition.orderID,
+        tokenId: newPosition.tokenId,
+        question: newPosition.marketQuestion,
+      });
 
       const updatedPortfolio = {
         ...currentPortfolio,

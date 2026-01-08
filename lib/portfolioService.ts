@@ -55,9 +55,9 @@ export class PortfolioService {
           p.orderID = p.id;
         }
         if (!p.tokenId) {
-          console.error(`❌ Position missing tokenId! This will prevent selling: ${p.marketQuestion}`);
-          // Don't auto-fix here, let it fail so we know there's a problem
-          throw new Error(`Position "${p.marketQuestion}" is missing required tokenId field. Cannot save to Firestore.`);
+          console.warn(`⚠️ Position missing tokenId! This will prevent selling: ${p.marketQuestion}`);
+          console.warn(`   Position will be saved but cannot be sold until tokenId is added.`);
+          // Allow save but log warning - user needs to run fix script
         }
         return p;
       });
