@@ -232,8 +232,8 @@ export default function CLOBPortfolio() {
   const displayPositions = activeView === 'closed'
     ? data?.closedPositions || []
     : activeView === 'open'
-    ? data?.activePositions || []
-    : [];
+      ? data?.activePositions || []
+      : [];
 
   return (
     <div className={styles.container}>
@@ -400,7 +400,7 @@ export default function CLOBPortfolio() {
                         {trade.marketTitle || 'Unknown Market'}
                       </div>
                       <div className={`${styles.positionOutcome} ${isBuy ? styles.yes : styles.no}`}>
-                        {trade.side} {trade.outcome.toUpperCase()}
+                        {trade.side} {trade.outcome?.toUpperCase()}
                       </div>
                     </div>
                   </div>
@@ -456,107 +456,107 @@ export default function CLOBPortfolio() {
             </div>
           ) : (
             displayPositions.map((position) => {
-            const positionKey = `${position.market}-${position.asset_id}`;
-            const costBasis = position.avgBuyPrice * position.netSize;
-            const pnl = calculatePnL(position);
+              const positionKey = `${position.market}-${position.asset_id}`;
+              const costBasis = position.avgBuyPrice * position.netSize;
+              const pnl = calculatePnL(position);
 
-            return (
-              <div key={positionKey} className={styles.positionCard}>
-                <div className={styles.positionHeader}>
-                  <div className={styles.positionHeaderContent}>
-                    <div className={styles.positionQuestion}>
-                      {position.marketTitle}
-                    </div>
-                    <div className={`${styles.positionOutcome} ${position.outcome.toLowerCase() === 'yes' ? styles.yes : styles.no}`}>
-                      {position.outcome.toUpperCase()}
+              return (
+                <div key={positionKey} className={styles.positionCard}>
+                  <div className={styles.positionHeader}>
+                    <div className={styles.positionHeaderContent}>
+                      <div className={styles.positionQuestion}>
+                        {position.marketTitle}
+                      </div>
+                      <div className={`${styles.positionOutcome} ${position.outcome.toLowerCase() === 'yes' ? styles.yes : styles.no}`}>
+                        {position.outcome.toUpperCase()}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className={styles.positionDetails}>
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Position Size</span>
-                    <span className={styles.detailValue}>{position.netSize.toFixed(2)}</span>
-                  </div>
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Avg Buy Price</span>
-                    <span className={styles.detailValue}>${position.avgBuyPrice.toFixed(3)}</span>
-                  </div>
-                  {position.curPrice !== undefined && (
+                  <div className={styles.positionDetails}>
                     <div className={styles.detailRow}>
-                      <span className={styles.detailLabel}>Current Price</span>
-                      <span className={styles.detailValue}>${position.curPrice.toFixed(3)}</span>
+                      <span className={styles.detailLabel}>Position Size</span>
+                      <span className={styles.detailValue}>{position.netSize.toFixed(2)}</span>
                     </div>
-                  )}
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Cost Basis</span>
-                    <span className={styles.detailValue}>${costBasis.toFixed(2)}</span>
-                  </div>
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Total Bought</span>
-                    <span className={styles.detailValue}>{position.totalBought.toFixed(2)}</span>
-                  </div>
-                  {position.totalSold > 0 && (
-                    <>
+                    <div className={styles.detailRow}>
+                      <span className={styles.detailLabel}>Avg Buy Price</span>
+                      <span className={styles.detailValue}>${position.avgBuyPrice.toFixed(3)}</span>
+                    </div>
+                    {position.curPrice !== undefined && (
                       <div className={styles.detailRow}>
-                        <span className={styles.detailLabel}>Total Sold</span>
-                        <span className={styles.detailValue}>{position.totalSold.toFixed(2)}</span>
+                        <span className={styles.detailLabel}>Current Price</span>
+                        <span className={styles.detailValue}>${position.curPrice.toFixed(3)}</span>
                       </div>
-                      <div className={styles.detailRow}>
-                        <span className={styles.detailLabel}>Avg Sell Price</span>
-                        <span className={styles.detailValue}>${position.avgSellPrice.toFixed(3)}</span>
+                    )}
+                    <div className={styles.detailRow}>
+                      <span className={styles.detailLabel}>Cost Basis</span>
+                      <span className={styles.detailValue}>${costBasis.toFixed(2)}</span>
+                    </div>
+                    <div className={styles.detailRow}>
+                      <span className={styles.detailLabel}>Total Bought</span>
+                      <span className={styles.detailValue}>{position.totalBought.toFixed(2)}</span>
+                    </div>
+                    {position.totalSold > 0 && (
+                      <>
+                        <div className={styles.detailRow}>
+                          <span className={styles.detailLabel}>Total Sold</span>
+                          <span className={styles.detailValue}>{position.totalSold.toFixed(2)}</span>
+                        </div>
+                        <div className={styles.detailRow}>
+                          <span className={styles.detailLabel}>Avg Sell Price</span>
+                          <span className={styles.detailValue}>${position.avgSellPrice.toFixed(3)}</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* P&L Display - Always shown for both active and closed positions */}
+                  {position.status === 'active' ? (
+                    <div className={styles.positionPnL}>
+                      {(() => {
+                        // Use fetched P&L data if available, otherwise calculate with fallback
+                        const currentPrice = position.curPrice || position.avgBuyPrice;
+                        const pnlValue = position.cashPnl !== undefined ? position.cashPnl : (currentPrice - position.avgBuyPrice) * position.netSize;
+                        const pnlPercent = position.percentPnl !== undefined ? position.percentPnl : (position.avgBuyPrice > 0 ? ((currentPrice - position.avgBuyPrice) / position.avgBuyPrice) * 100 : 0);
+
+                        return (
+                          <div className={`${styles.pnlValue} ${pnlValue >= 0 ? styles.positive : styles.negative}`}>
+                            {pnlValue >= 0 ? '+' : ''}${pnlValue.toFixed(2)} ({pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  ) : pnl !== null ? (
+                    // Closed position P&L
+                    <div className={styles.positionPnL}>
+                      <div className={`${styles.pnlValue} ${pnl >= 0 ? styles.positive : styles.negative}`}>
+                        {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}
                       </div>
-                    </>
+                    </div>
+                  ) : null}
+
+                  {position.status === 'active' && (
+                    <div className={styles.positionActions}>
+                      <button
+                        className={styles.sellButton}
+                        onClick={() => handleSellClick(position)}
+                        disabled={sellLoading === positionKey}
+                      >
+                        {sellLoading === positionKey ? (
+                          <>
+                            <span className={styles.buttonSpinner}></span>
+                            Selling...
+                          </>
+                        ) : (
+                          <>🚀 Sell Position</>
+                        )}
+                      </button>
+                    </div>
                   )}
                 </div>
-
-                {/* P&L Display - Always shown for both active and closed positions */}
-                {position.status === 'active' ? (
-                  <div className={styles.positionPnL}>
-                    {(() => {
-                      // Use fetched P&L data if available, otherwise calculate with fallback
-                      const currentPrice = position.curPrice || position.avgBuyPrice;
-                      const pnlValue = position.cashPnl !== undefined ? position.cashPnl : (currentPrice - position.avgBuyPrice) * position.netSize;
-                      const pnlPercent = position.percentPnl !== undefined ? position.percentPnl : (position.avgBuyPrice > 0 ? ((currentPrice - position.avgBuyPrice) / position.avgBuyPrice) * 100 : 0);
-
-                      return (
-                        <div className={`${styles.pnlValue} ${pnlValue >= 0 ? styles.positive : styles.negative}`}>
-                          {pnlValue >= 0 ? '+' : ''}${pnlValue.toFixed(2)} ({pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
-                        </div>
-                      );
-                    })()}
-                  </div>
-                ) : pnl !== null ? (
-                  // Closed position P&L
-                  <div className={styles.positionPnL}>
-                    <div className={`${styles.pnlValue} ${pnl >= 0 ? styles.positive : styles.negative}`}>
-                      {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}
-                    </div>
-                  </div>
-                ) : null}
-
-                {position.status === 'active' && (
-                  <div className={styles.positionActions}>
-                    <button
-                      className={styles.sellButton}
-                      onClick={() => handleSellClick(position)}
-                      disabled={sellLoading === positionKey}
-                    >
-                      {sellLoading === positionKey ? (
-                        <>
-                          <span className={styles.buttonSpinner}></span>
-                          Selling...
-                        </>
-                      ) : (
-                        <>🚀 Sell Position</>
-                      )}
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })
-        )}
+              );
+            })
+          )}
         </div>
       )}
     </div>

@@ -41,10 +41,10 @@ export default async function handler(
   }
 
   try {
-    const privateKey = process.env.WALLET_PRIVATE_KEY?.replace(/'/g, '');
-    const apiKey = process.env.CLOB_API_KEY?.replace(/'/g, '');
-    const secret = process.env.CLOB_SECRET?.replace(/'/g, '');
-    const passphrase = process.env.CLOB_PASS_PHRASE?.replace(/'/g, '');
+    const privateKey = process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY?.replace(/'/g, '');
+    const apiKey = process.env.NEXT_PUBLIC_CLOB_API_KEY?.replace(/'/g, '');
+    const secret = process.env.NEXT_PUBLIC_CLOB_SECRET?.replace(/'/g, '');
+    const passphrase = process.env.NEXT_PUBLIC_CLOB_PASS_PHRASE?.replace(/'/g, '');
 
     if (!privateKey || !apiKey || !secret || !passphrase) {
       throw new Error('Missing required credentials');
@@ -57,7 +57,7 @@ export default async function handler(
     const clobClient = new ClobClient(
       'https://clob.polymarket.com',
       137, // Polygon mainnet
-      wallet,
+      wallet as any, // Type assertion to bypass ethers v5/v6 compatibility
       { key: apiKey, secret, passphrase }
     );
 
