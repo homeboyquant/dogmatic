@@ -5,18 +5,24 @@ import { ethers } from 'ethers';
 
 const CLOB_API_URL = 'https://clob.polymarket.com';
 
-interface ClobCredentials {
-  apiKey: string;
-  secret: string;
-  passPhrase: string;
-  walletAddress?: string;
+// Helper to derive CLOB credentials from private key (same as sell-position.ts)
+function deriveClobCredentials(privateKey: string) {
+  const wallet = new ethers.Wallet(privateKey);
+  const apiKey = wallet.address.toLowerCase();
+
+  // Derive deterministic secret and passphrase
+  const hash = crypto.createHash('sha256').update(privateKey).digest();
+  const secret = hash.toString('base64');
+  const passPhrase = crypto.createHash('sha256').update(hash).digest('hex');
+
+  return { apiKey, secret, passPhrase, address: wallet.address };
 }
 
 /**
  * Generate authentication headers for Polymarket CLOB API
  */
 function generateAuthHeaders(
-  credentials: ClobCredentials,
+  credentials: { apiKey: string; secret: string; passPhrase: string; address: string },
   method: string,
   requestPath: string,
   body?: any
@@ -36,7 +42,7 @@ function generateAuthHeaders(
   });
 
   return {
-    'POLY-ADDRESS': credentials.walletAddress || credentials.apiKey,
+    'POLY-ADDRESS': credentials.address,
     'POLY-SIGNATURE': signature,
     'POLY-TIMESTAMP': timestamp,
     'POLY-PASSPHRASE': credentials.passPhrase,
@@ -53,27 +59,24 @@ export default async function handler(
   }
 
   try {
-    // Derive wallet address from private key
-    const privateKey = process.env.NEXT_PUBLIC_TRADING_PRIVATE_KEY || '';
-    if (!privateKey) {
-      return res.status(500).json({ error: 'Trading private key not configured' });
-    }
+    // Use stored CLOB credentials (same as homeboy_monitor)
+    const apiKey = process.env.CLOB_API_KEY?.replace(/'/g, '');
+    const secret = process.env.CLOB_SECRET?.replace(/'/g, '');
+    const passPhrase = process.env.CLOB_PASS_PHRASE?.replace(/'/g, '');
+    const walletAddress = process.env.WALLET_PUBLIC_ADDRESS?.replace(/'/g, '');
 
-    const wallet = new ethers.Wallet(privateKey);
-    const walletAddress = wallet.address;
-
-    const credentials: ClobCredentials = {
-      apiKey: process.env.NEXT_PUBLIC_CLOB_API_KEY || '',
-      secret: process.env.NEXT_PUBLIC_CLOB_SECRET || '',
-      passPhrase: process.env.NEXT_PUBLIC_CLOB_PASS_PHRASE || '',
-      walletAddress,
-    };
-
-    if (!credentials.apiKey || !credentials.secret || !credentials.passPhrase) {
+    if (!apiKey || !secret || !passPhrase || !walletAddress) {
       return res.status(500).json({ error: 'CLOB credentials not configured' });
     }
 
-    console.log('🔑 Using Wallet Address:', walletAddress);
+    const credentials = {
+      apiKey,
+      secret,
+      passPhrase,
+      address: walletAddress
+    };
+
+    console.log('🔑 Using Wallet Address:', credentials.address);
 
     // Fetch user orders (open positions)
     const ordersPath = '/data/orders';

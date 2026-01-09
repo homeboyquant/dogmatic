@@ -1,0 +1,54 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+const TRADING_API_URL = process.env.NEXT_PUBLIC_TRADING_API_URL || 'https://homeboyapi-318538657595.me-west1.run.app';
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const { token_id, order_id, sell_percentage } = req.body;
+
+    if (!token_id || !order_id) {
+      return res.status(400).json({
+        error: 'Missing required fields: token_id and order_id are required'
+      });
+    }
+
+    const sellPercentage = sell_percentage || 100;
+
+    console.log('🔴 Selling CLOB position:', {
+      token_id,
+      order_id,
+      sell_percentage: sellPercentage
+    });
+
+    const response = await fetch(`${TRADING_API_URL}/sell_fast`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token_id,
+        order_id,
+        sell_percentage: sellPercentage
+      }),
+    });
+
+    const data = await response.json();
+    console.log('📤 Sell response:', data);
+
+    return res.status(200).json(data);
+  } catch (error: unknown) {
+    console.error('❌ Error selling CLOB position:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    return res.status(500).json({
+      status: 'failed',
+      response: { error: errorMessage },
+    });
+  }
+}

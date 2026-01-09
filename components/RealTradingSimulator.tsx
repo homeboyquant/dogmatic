@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './TradingSimulator.module.css';
 import Portfolio from './Portfolio';
+import CLOBPortfolio from './CLOBPortfolio';
 import Toast from './Toast';
 import Leaderboard from './Leaderboard';
 import type { Position, Trade, Portfolio as PortfolioType, PerformanceSnapshot } from '@/types/trading';
@@ -606,23 +607,8 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
   }));
 
   if (currentView === 'portfolio') {
-    return (
-      <Portfolio
-        positions={convertedPositions}
-        balance={portfolio.balance}
-        initialBalance={portfolio.initialBalance}
-        onClose={handleClosePosition}
-        onUpdateThesis={handleUpdateThesis}
-        onUpdatePolymarketUrl={handleUpdatePolymarketUrl}
-        onUpdateExitNotes={handleUpdateExitNotes}
-        isProcessing={tradingInProgress}
-        sellingPositionId={sellingPositionId}
-        pnlHistory={(portfolio.pnlHistory || []).map(snap => ({
-          timestamp: snap.timestamp,
-          pnl: snap.totalPnL,
-        }))}
-      />
-    );
+    // Use CLOBPortfolio which fetches data directly from CLOB API (like homeboy_monitor)
+    return <CLOBPortfolio />;
   }
 
   // Calculate PnL

@@ -14,6 +14,7 @@
     "@google-cloud/vision": "^4.3.2",
     "@ilovepdf/ilovepdf-js": "^0.3.0",
     "@pinecone-database/pinecone": "^4.0.0",
+    "@polymarket/clob-client": "^5.2.0",
     "@primer/react-brand": "^0.33.0",
     "@radix-ui/react-dialog": "^1.1.2",
     "@react-oauth/google": "^0.11.1",
@@ -89,7 +90,8 @@
     "tls": "^0.0.1",
     "ts-node": "^10.9.2",
     "uuid": "^9.0.0",
-    "uuidv4": "^6.2.13"
+    "uuidv4": "^6.2.13",
+    "viem": "^2.44.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",

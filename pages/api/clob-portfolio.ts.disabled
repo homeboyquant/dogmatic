@@ -1,0 +1,240 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { ethers } from 'ethers';
+
+// Dynamic import for ESM package
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { ClobClient } = require('@polymarket/clob-client');
+
+interface Trade {
+  id: string;
+  taker_order_id: string;
+  market: string;
+  asset_id: string;
+  side: string;
+  size: string;
+  price: string;
+  match_time: string;
+  outcome: string;
+}
+
+type OpenOrdersResponse = any[];
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    // Use NEXT_PUBLIC_ prefixed variables (accessible in API routes)
+    const apiKey = process.env.NEXT_PUBLIC_CLOB_API_KEY;
+    const secret = process.env.NEXT_PUBLIC_CLOB_SECRET;
+    const passphrase = process.env.NEXT_PUBLIC_CLOB_PASS_PHRASE;
+    const privateKey = process.env.NEXT_PUBLIC_TRADING_PRIVATE_KEY;
+
+    console.log('🔍 Checking credentials...');
+    console.log('API Key exists:', !!apiKey);
+    console.log('Secret exists:', !!secret);
+    console.log('Passphrase exists:', !!passphrase);
+    console.log('Private Key exists:', !!privateKey);
+
+    if (!apiKey || !secret || !passphrase) {
+      console.error('❌ Missing CLOB credentials');
+      return res.status(500).json({
+        error: 'Missing CLOB credentials in environment variables',
+        message: 'Make sure NEXT_PUBLIC_CLOB_API_KEY, NEXT_PUBLIC_CLOB_SECRET, and NEXT_PUBLIC_CLOB_PASS_PHRASE are set in .env.local',
+      });
+    }
+
+    if (!privateKey) {
+      console.error('❌ Missing private key');
+      return res.status(500).json({
+        error: 'NEXT_PUBLIC_TRADING_PRIVATE_KEY not configured',
+        message: 'To fetch your actual trades, you need to add NEXT_PUBLIC_TRADING_PRIVATE_KEY to your .env.local file.',
+        instructions: 'Add this line to .env.local: NEXT_PUBLIC_TRADING_PRIVATE_KEY=\'your_private_key_here\'',
+        orders: [],
+        activePositions: [],
+        closedPositions: [],
+        recentTrades: [],
+        stats: { totalActive: 0, totalClosed: 0, totalTrades: 0 },
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    // Create wallet from private key
+    console.log('🔑 Creating wallet from private key...');
+    const wallet = new ethers.Wallet(privateKey.replace(/'/g, ''));
+
+    console.log('🔑 Using wallet address:', wallet.address);
+
+    // Initialize CLOB client
+    const clobClient = new ClobClient(
+      'https://clob.polymarket.com',
+      137, // Polygon mainnet
+      wallet,
+      {
+        key: apiKey.replace(/'/g, ''),
+        secret: secret.replace(/'/g, ''),
+        passphrase: passphrase.replace(/'/g, ''),
+      }
+    );
+
+    console.log('📊 Fetching open orders from CLOB...');
+    // Get open orders
+    const openOrdersResponse: OpenOrdersResponse = await clobClient.getOpenOrders();
+
+    console.log('📜 Fetching all trades from CLOB...');
+    // Get all trades to calculate positions
+    let allTrades: Trade[] = [];
+    try {
+      allTrades = await clobClient.getTrades({}, true);
+      console.log('✅ Fetched', allTrades.length, 'total trades');
+    } catch (error) {
+      console.log('❌ Could not fetch trades:', error);
+    }
+
+    // Calculate net positions from trades
+    const positions = new Map<string, {
+      market: string;
+      asset_id: string;
+      outcome: string;
+      netSize: number;
+      avgBuyPrice: number;
+      avgSellPrice: number;
+      totalBought: number;
+      totalSold: number;
+      buyTrades: Trade[];
+      sellTrades: Trade[];
+      marketTitle?: string;
+    }>();
+
+    for (const trade of allTrades) {
+      const key = `${trade.market}-${trade.asset_id}`;
+      if (!positions.has(key)) {
+        positions.set(key, {
+          market: trade.market,
+          asset_id: trade.asset_id,
+          outcome: trade.outcome,
+          netSize: 0,
+          avgBuyPrice: 0,
+          avgSellPrice: 0,
+          totalBought: 0,
+          totalSold: 0,
+          buyTrades: [],
+          sellTrades: [],
+        });
+      }
+
+      const pos = positions.get(key)!;
+      const size = parseFloat(trade.size);
+      const price = parseFloat(trade.price);
+
+      if (trade.side === 'BUY') {
+        pos.totalBought += size;
+        pos.avgBuyPrice = ((pos.avgBuyPrice * (pos.totalBought - size)) + (price * size)) / pos.totalBought;
+        pos.netSize += size;
+        pos.buyTrades.push(trade);
+      } else {
+        pos.totalSold += size;
+        pos.avgSellPrice = ((pos.avgSellPrice * (pos.totalSold - size)) + (price * size)) / pos.totalSold;
+        pos.netSize -= size;
+        pos.sellTrades.push(trade);
+      }
+    }
+
+    // Sort all positions by last trade time
+    const allPositions = Array.from(positions.values())
+      .sort((a, b) => {
+        const lastTradeA = Math.max(
+          ...a.buyTrades.map(t => parseInt(t.match_time)),
+          ...a.sellTrades.map(t => parseInt(t.match_time))
+        );
+        const lastTradeB = Math.max(
+          ...b.buyTrades.map(t => parseInt(t.match_time)),
+          ...b.sellTrades.map(t => parseInt(t.match_time))
+        );
+        return lastTradeB - lastTradeA;
+      });
+
+    // Active positions: netSize > 0.5 (remaining shares)
+    const activePositions = allPositions.filter(pos => pos.netSize > 0.5);
+
+    // Closed positions: netSize <= 0.5 and had buys (fully sold or dust)
+    const closedPositions = allPositions
+      .filter(pos => pos.netSize <= 0.5 && pos.totalBought > 0);
+
+    console.log('📊 Active positions:', activePositions.length);
+    console.log('📊 Closed positions:', closedPositions.length);
+
+    // Fetch market titles for all positions in parallel
+    const marketTitles = new Map<string, string>();
+    const positionsToFetch = [...activePositions, ...closedPositions];
+    const uniqueMarkets = [...new Set(positionsToFetch.map(p => p.market))];
+
+    console.log('🔍 Fetching market titles for', uniqueMarkets.length, 'unique markets...');
+
+    // Fetch all market titles in parallel for speed
+    const marketPromises = uniqueMarkets.map(async (marketId) => {
+      try {
+        const market = await clobClient.getMarket(marketId);
+        return { marketId, question: market?.question };
+      } catch {
+        console.log(`⚠️ Could not fetch market title for ${marketId}`);
+        return { marketId, question: undefined };
+      }
+    });
+
+    const marketResults = await Promise.all(marketPromises);
+    marketResults.forEach(({ marketId, question }) => {
+      if (question) {
+        marketTitles.set(marketId, question);
+      }
+    });
+
+    // Add market titles to positions
+    const activePositionsWithTitles = activePositions.map(pos => ({
+      ...pos,
+      marketTitle: marketTitles.get(pos.market) || 'Unknown Market',
+      status: 'active' as const,
+    }));
+
+    const closedPositionsWithTitles = closedPositions.map(pos => ({
+      ...pos,
+      marketTitle: marketTitles.get(pos.market) || 'Unknown Market',
+      status: 'closed' as const,
+    }));
+
+    // Get recent individual trades (last 50 for trade history)
+    const recentTrades = allTrades
+      .sort((a, b) => parseInt(b.match_time) - parseInt(a.match_time))
+      .slice(0, 50)
+      .map(trade => ({
+        ...trade,
+        marketTitle: marketTitles.get(trade.market),
+      }));
+
+    console.log('✅ Portfolio data compiled successfully');
+
+    return res.status(200).json({
+      orders: openOrdersResponse || [],
+      activePositions: activePositionsWithTitles,
+      closedPositions: closedPositionsWithTitles,
+      recentTrades,
+      stats: {
+        totalActive: activePositionsWithTitles.length,
+        totalClosed: closedPositionsWithTitles.length,
+        totalTrades: allTrades.length,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error: unknown) {
+    console.error('❌ Error fetching CLOB portfolio:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    return res.status(500).json({
+      error: 'Failed to fetch CLOB portfolio',
+      details: errorMessage,
+    });
+  }
+}
