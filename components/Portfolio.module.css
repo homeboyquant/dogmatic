@@ -859,25 +859,30 @@
   }
 
   .positionPnL {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
     gap: 12px;
-    align-items: stretch;
+  }
+
+  .pnlValue {
+    align-self: flex-start;
   }
 
   .positionActions {
     flex-direction: column;
-    width: 100%;
+    width: auto;
+    align-items: flex-end;
+    gap: 8px;
   }
 
-  .closeButton,
-  .deleteButton {
-    width: 100%;
+  .sellButton {
+    align-self: flex-end;
   }
 
   .viewOnPolymarketButton,
   .addPolymarketLinkButton {
-    width: 100%;
-    justify-content: center;
+    align-self: flex-end;
   }
 }
 
