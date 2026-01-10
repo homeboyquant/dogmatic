@@ -611,9 +611,6 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
     return <CLOBPortfolio />;
   }
 
-  // Calculate PnL
-  const pnlData = realTradingService.calculatePnL(portfolio.positions);
-
   return (
     <div className={styles.container}>
 
@@ -688,28 +685,6 @@ export default function RealTradingSimulator({ currentView }: TradingSimulatorPr
             Search for any prediction market by typing keywords or questions
           </div>
         )}
-      </div>
-
-      {/* Portfolio Stats */}
-      <div className={styles.statsBar}>
-        <div className={styles.statCard}>
-          <div className={styles.statLabel}>Total P&L</div>
-          <div className={`${styles.statValue} ${pnlData.total >= 0 ? styles.positive : styles.negative}`}>
-            {pnlData.total >= 0 ? '+' : ''}${pnlData.total.toFixed(2)}
-          </div>
-        </div>
-        <div className={styles.statCard}>
-          <div className={styles.statLabel}>Realized P&L</div>
-          <div className={`${styles.statValue} ${pnlData.realized >= 0 ? styles.positive : styles.negative}`}>
-            {pnlData.realized >= 0 ? '+' : ''}${pnlData.realized.toFixed(2)}
-          </div>
-        </div>
-        <div className={styles.statCard}>
-          <div className={styles.statLabel}>Unrealized P&L</div>
-          <div className={`${styles.statValue} ${pnlData.unrealized >= 0 ? styles.positive : styles.negative}`}>
-            {pnlData.unrealized >= 0 ? '+' : ''}${pnlData.unrealized.toFixed(2)}
-          </div>
-        </div>
       </div>
 
       {/* Leaderboard - only show when no event is selected */}
