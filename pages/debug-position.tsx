@@ -13,7 +13,8 @@ export default function DebugPosition() {
 
     async function fetchData() {
       try {
-        const portfolio = await portfolioService.getPortfolio(userId);
+        if (!userId) return;
+        const portfolio = await portfolioService.getOrCreatePortfolio(userId);
 
         // Find Heat vs Pacers position
         const heatPacersPosition = portfolio?.positions.find((p: any) =>
