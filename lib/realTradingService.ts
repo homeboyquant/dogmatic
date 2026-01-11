@@ -275,11 +275,36 @@ class RealTradingService {
 
     const newShares = position.shares - trade.sizeMatched;
 
+    // Track cumulative sold value and shares for weighted average exit price
+    const previousSoldValue = position.totalSoldValue || 0;
+    const previousSoldShares = position.totalSoldShares || 0;
+    const currentSoldValue = previousSoldValue + soldValue;
+    const currentSoldShares = previousSoldShares + trade.sizeMatched;
+
     let updatedPositions;
-    if (newShares <= 0.01) {
-      // Close position completely - keep original shares for P&L calculation
-      const originalShares = position.shares;
-      const realizedPnL = (currentPrice - position.avgPrice) * originalShares;
+    // Close position if remaining shares are negligible (< 0.1 to account for floating point errors)
+    if (newShares <= 0.1) {
+      // Close position completely
+      // Calculate weighted average exit price from all sells
+      const weightedAvgExitPrice = currentSoldValue / currentSoldShares;
+      const originalShares = position.shares + previousSoldShares; // Total shares ever owned
+      // Original cost = current remaining cost + cost of shares already sold
+      const costOfPreviouslySoldShares = position.avgPrice * previousSoldShares;
+      const totalCost = position.cost + costOfPreviouslySoldShares;
+      const realizedPnL = currentSoldValue - totalCost;
+
+      console.log(`🔒 Closing position completely:`, {
+        positionId,
+        question: position.marketQuestion,
+        originalShares,
+        totalSoldShares: currentSoldShares,
+        remainingShares: newShares,
+        avgEntryPrice: position.avgPrice,
+        weightedAvgExitPrice,
+        totalCost,
+        totalSoldValue: currentSoldValue,
+        realizedPnL
+      });
 
       updatedPositions = (currentPortfolio.positions || []).map(p =>
         p.id === positionId
@@ -287,19 +312,32 @@ class RealTradingService {
               ...p,
               closed: true,
               closedAt: Date.now(),
-              exitPrice: currentPrice,
+              exitPrice: weightedAvgExitPrice, // Weighted average of all sells
               exitOrderID: trade.orderID,
               originalShares, // Store original shares for display
-              shares: originalShares, // Keep shares for P&L calculation
+              shares: originalShares, // Keep original shares for P&L calculation
               value: 0, // Position no longer has value
               pnl: realizedPnL, // Store realized P&L
-              pnlPercent: (realizedPnL / position.cost) * 100,
+              pnlPercent: (realizedPnL / totalCost) * 100,
+              totalSoldValue: currentSoldValue,
+              totalSoldShares: currentSoldShares,
             }
           : p
       );
     } else {
-      // Partially close position
+      // Partially close position - track cumulative sells
       const newCost = position.cost - soldCost;
+
+      console.log(`📊 Partial sell:`, {
+        positionId,
+        question: position.marketQuestion,
+        soldShares: trade.sizeMatched,
+        remainingShares: newShares,
+        soldPrice: currentPrice,
+        totalSoldShares: currentSoldShares,
+        totalSoldValue: currentSoldValue,
+      });
+
       updatedPositions = (currentPortfolio.positions || []).map(p =>
         p.id === positionId
           ? {
@@ -310,6 +348,8 @@ class RealTradingService {
               value: newShares * currentPrice,
               pnl: (newShares * currentPrice) - newCost,
               pnlPercent: (((newShares * currentPrice) - newCost) / newCost) * 100,
+              totalSoldValue: currentSoldValue,
+              totalSoldShares: currentSoldShares,
             }
           : p
       );

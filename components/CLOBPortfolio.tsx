@@ -316,6 +316,27 @@ export default function CLOBPortfolio() {
         </div>
       )}
 
+      {/* P&L Warning Banner */}
+      <div style={{
+        background: 'rgba(245, 158, 11, 0.1)',
+        border: '1px solid rgba(245, 158, 11, 0.3)',
+        borderRadius: '8px',
+        padding: '12px 16px',
+        marginBottom: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px'
+      }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(245, 158, 11)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <div style={{ fontSize: '14px', color: 'rgb(245, 158, 11)' }}>
+          <strong>Note:</strong> P&L calculations may be slightly inaccurate. Use your account balance to gauge performance - we started at $500.
+        </div>
+      </div>
+
       {/* Summary Cards */}
       <div className={styles.summary}>
         <div className={styles.summaryCard}>

@@ -241,18 +241,6 @@ export default function Portfolio({ positions, balance, initialBalance, onClose,
           <div className={styles.summaryLabel}>Open Positions Value</div>
           <div className={styles.summaryValue}>${openPositionsValue.toFixed(2)}</div>
         </div>
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryLabel}>Total P&L</div>
-          <div className={`${styles.summaryValue} ${totalPnL >= 0 ? styles.positive : styles.negative}`}>
-            {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(2)}
-          </div>
-        </div>
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryLabel}>Realized P&L</div>
-          <div className={`${styles.summaryValue} ${realizedPnL >= 0 ? styles.positive : styles.negative}`}>
-            {realizedPnL >= 0 ? '+' : ''}${realizedPnL.toFixed(2)}
-          </div>
-        </div>
       </div>
 
       <div className={styles.toggleContainer}>

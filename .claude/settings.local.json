@@ -39,7 +39,8 @@
       "Bash(ls:*)",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(tasklist:*)"
+      "Bash(tasklist:*)",
+      "Bash(USER_ID=dogmatic1 npx tsx:*)"
     ],
     "deny": [],
     "ask": []
