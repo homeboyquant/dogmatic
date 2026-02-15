@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './TradingSimulator.module.css';
 import Portfolio from './Portfolio';
 import TradingTimer from './TradingTimer';
+import MarketSearch from './MarketSearch';
 import type { Position, Trade, Portfolio as PortfolioType } from '@/types/trading';
 import { portfolioService } from '@/lib/portfolioService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -228,18 +229,18 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
     setOrderbooks(orderbookData);
   };
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!slug.trim()) return;
+  const handleSearch = async (searchSlug: string) => {
+    if (!searchSlug.trim()) return;
 
     setLoading(true);
+    setSlug(searchSlug);
     try {
-      const response = await fetch(`/api/events?slug=${encodeURIComponent(slug)}`);
+      const response = await fetch(`/api/events?slug=${encodeURIComponent(searchSlug)}`);
       const data = await response.json();
 
       if (Array.isArray(data) && data.length > 0) {
         setEvent(data[0]);
-        setLoading(false); // Stop loading immediately after event is set
+        setLoading(false);
 
         // Fetch orderbooks in background (don't block UI)
         if (data[0].markets) {
@@ -743,25 +744,19 @@ export default function TradingSimulator({ currentView, renderTimerOnly = false 
 
       {/* Search bar always visible at top */}
       <div className={styles.searchSection}>
-        <form className={styles.searchForm} onSubmit={handleSearch}>
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="Enter market slug (e.g., trump-popular-vote-2024)"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-          />
-          <button type="submit" className={styles.searchButton} disabled={loading}>
-            {loading ? (
-              <span className={styles.loadingSpinner}>⏳</span>
-            ) : (
-              <span>Search</span>
-            )}
-          </button>
-        </form>
-        {!event && (
+        <MarketSearch
+          onSelectEvent={handleSearch}
+          placeholder="Search prediction markets..."
+        />
+        {loading && (
+          <div className={styles.searchLoading}>
+            <span className={styles.loadingSpinner}>⏳</span>
+            <span>Loading market data...</span>
+          </div>
+        )}
+        {!event && !loading && (
           <div className={styles.searchHint}>
-            Find prediction markets on <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer">Polymarket</a> and enter their slug to start trading
+            Search for any prediction market on <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer">Polymarket</a> to start paper trading
           </div>
         )}
       </div>

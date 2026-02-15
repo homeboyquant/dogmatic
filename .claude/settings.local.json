@@ -33,7 +33,8 @@
       "Bash(node:*)",
       "Bash(npm run build:*)",
       "Bash(npm run dev:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "WebFetch(domain:docs.polymarket.com)"
     ],
     "deny": [],
     "ask": []
